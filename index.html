@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jリーグ・マネー図鑑 — 経営でJリーグを読む</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --cream:#FFF6E9; --paper:#FFFDF7; --ink:#243447; --ink-soft:#5b6b7b;
+  --pitch:#12B36A; --pitch-dk:#0B8F52; --pink:#FF5C8A; --yellow:#FFC948;
+  --blue:#4C8DFF; --purple:#8A6BFF; --orange:#FF8A3D;
+  --line:#EADFC8; --shadow:rgba(36,52,71,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Zen Maru Gothic',system-ui,sans-serif;
+  background:var(--cream); color:var(--ink);
+  background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);
+  background-size:22px 22px;
+  -webkit-font-smoothing:antialiased;line-height:1.7;
+}
+h1,h2,h3,.baloo{font-family:'Baloo 2','Zen Maru Gothic',cursive}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:64px 0;position:relative;overflow:hidden}
+.wrap{position:relative}
+.sec-deco{position:absolute;top:30px;right:10px;width:118px;height:118px;opacity:.85;pointer-events:none;z-index:0 !important}
+.wrap>*{position:relative;z-index:1}
+@media(max-width:900px){.sec-deco{display:none}}
+.eyebrow{display:inline-block;background:var(--ink);color:#fff;font-weight:700;
+  font-size:.78rem;letter-spacing:.14em;padding:5px 14px;border-radius:999px;margin-bottom:14px}
+h2.title{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;line-height:1.25}
+.lead{color:var(--ink-soft);max-width:640px;margin-top:10px;font-size:1.02rem}
+
+/* ---------- NAV ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(255,246,233,.86);
+  backdrop-filter:blur(8px);border-bottom:2px dashed var(--line)}
+nav .wrap{display:flex;align-items:center;gap:8px;height:62px}
+.brand{font-family:'Baloo 2';font-weight:800;font-size:1.2rem;display:flex;align-items:center;gap:9px;margin-right:auto}
+.brand .ball{width:30px;height:30px}
+nav a.navlink{color:var(--ink);text-decoration:none;font-weight:700;font-size:.9rem;
+  padding:7px 12px;border-radius:999px;transition:.15s}
+nav a.navlink:hover{background:var(--ink);color:#fff}
+.nav-links{display:flex;gap:2px}
+@media(max-width:820px){.nav-links{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{padding:70px 0 40px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(2.3rem,6vw,4rem);font-weight:800;line-height:1.08}
+.hero h1 .hl{position:relative;white-space:nowrap}
+.hero h1 .hl:after{content:"";position:absolute;left:-2px;right:-2px;bottom:6px;height:14px;
+  background:var(--yellow);z-index:-1;border-radius:4px;transform:rotate(-1.2deg)}
+.hero p.sub{font-size:1.1rem;color:var(--ink-soft);margin:20px 0 26px;max-width:520px}
+.cta{display:inline-flex;align-items:center;gap:9px;background:var(--pitch);color:#fff;
+  font-family:'Baloo 2';font-weight:700;font-size:1.05rem;text-decoration:none;
+  padding:13px 26px;border-radius:999px;box-shadow:0 6px 0 var(--pitch-dk);transition:.12s}
+.cta:hover{transform:translateY(2px);box-shadow:0 4px 0 var(--pitch-dk)}
+.cta.ghost{background:#fff;color:var(--ink);box-shadow:0 6px 0 var(--line);margin-left:10px}
+.cta.ghost:hover{box-shadow:0 4px 0 var(--line)}
+.hero-art{position:relative}
+.float{animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ---------- STAT BADGES ---------- */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px}
+@media(max-width:860px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;padding:18px 16px;
+  box-shadow:5px 5px 0 var(--ink);position:relative}
+.stat .k{font-family:'Baloo 2';font-weight:800;font-size:2rem;line-height:1;color:var(--pitch-dk)}
+.stat .k.pink{color:var(--pink)} .stat .k.blue{color:var(--blue)} .stat .k.orange{color:var(--orange)}
+.stat .l{font-size:.82rem;color:var(--ink-soft);margin-top:8px;font-weight:700}
+.stat .emoji{position:absolute;top:-14px;right:-10px;font-size:1.6rem;transform:rotate(12deg)}
+
+/* ---------- CARD / PANEL ---------- */
+.panel{background:var(--paper);border:2.5px solid var(--ink);border-radius:24px;
+  box-shadow:7px 7px 0 var(--ink);padding:26px}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}
+.chip{font-family:'Baloo 2';font-weight:700;font-size:.92rem;border:2.5px solid var(--ink);
+  background:#fff;color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer;transition:.12s}
+.chip:hover{transform:translateY(-2px)}
+.chip.active{background:var(--ink);color:#fff}
+.chart-box{position:relative;width:100%}
+
+/* ---------- CLUB GRID ---------- */
+.club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:26px}
+.club-card{background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;padding:14px;
+  cursor:pointer;transition:.14s;box-shadow:4px 4px 0 var(--ink);position:relative;overflow:hidden}
+.club-card:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.club-card .cbar{height:8px;border-radius:6px;margin-bottom:10px}
+.club-card .cn{font-family:'Baloo 2';font-weight:700;font-size:1.02rem;line-height:1.15}
+.club-card .cr{font-size:.76rem;color:var(--ink-soft);margin-top:3px}
+.club-card .cv{font-family:'Baloo 2';font-weight:800;font-size:1.35rem;margin-top:8px}
+.club-card .cv small{font-size:.7rem;font-weight:700;color:var(--ink-soft)}
+.badge-mini{position:absolute;top:8px;right:8px;font-size:.62rem;font-weight:800;
+  padding:2px 7px;border-radius:999px;color:#fff}
+
+/* ---------- MODAL ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(36,52,71,.55);display:none;z-index:100;
+  align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--paper);border:3px solid var(--ink);border-radius:26px;max-width:640px;width:100%;
+  max-height:88vh;overflow-y:auto;box-shadow:10px 10px 0 var(--ink);position:relative}
+.modal-head{padding:22px 26px;border-bottom:2px dashed var(--line);position:sticky;top:0;background:var(--paper);z-index:2}
+.modal-head .close{position:absolute;top:18px;right:20px;width:34px;height:34px;border-radius:50%;
+  border:2.5px solid var(--ink);background:#fff;font-weight:800;cursor:pointer;font-size:1.1rem;line-height:1}
+.modal-body{padding:22px 26px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.kv .cell{background:var(--cream);border-radius:14px;padding:12px 14px;border:2px solid var(--line)}
+.kv .cell .lab{font-size:.74rem;color:var(--ink-soft);font-weight:700}
+.kv .cell .val{font-family:'Baloo 2';font-weight:800;font-size:1.25rem;margin-top:2px}
+.pl-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.9rem}
+.pl-table td{padding:7px 4px;border-bottom:1px dashed var(--line)}
+.pl-table td:last-child{text-align:right;font-family:'Baloo 2';font-weight:700}
+
+/* ---------- FLOW ---------- */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;margin-top:26px}
+@media(max-width:760px){.flow{grid-template-columns:1fr}.flow .arrow{transform:rotate(90deg);justify-self:center}}
+.flow-box{background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;padding:16px;text-align:center;box-shadow:4px 4px 0 var(--ink)}
+.flow-box .fi{font-size:1.8rem}
+.flow-box .ft{font-family:'Baloo 2';font-weight:700;margin-top:4px}
+.flow-box .fd{font-size:.78rem;color:var(--ink-soft)}
+.arrow{font-family:'Baloo 2';font-weight:800;font-size:1.6rem;color:var(--pitch);text-align:center}
+
+/* ---------- INSIGHT CARDS ---------- */
+.ins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+@media(max-width:820px){.ins-grid{grid-template-columns:1fr}}
+.ins{background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;padding:20px;box-shadow:5px 5px 0 var(--ink)}
+.ins .ic{font-size:2rem}
+.ins h3{font-size:1.15rem;margin:8px 0 6px}
+.ins p{font-size:.9rem;color:var(--ink-soft)}
+
+footer{background:var(--ink);color:#fff;padding:40px 0}
+footer a{color:var(--yellow)}
+footer .wrap{font-size:.86rem;line-height:1.9}
+.src-list{columns:2;margin-top:8px}
+@media(max-width:640px){.src-list{columns:1}}
+.tag{display:inline-block;background:var(--yellow);color:var(--ink);font-weight:800;font-size:.7rem;
+  padding:2px 9px;border-radius:999px;font-family:'Baloo 2'}
+.section-alt{background:var(--paper);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+.mvgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:760px){.mvgrid{grid-template-columns:repeat(2,1fr)}}
+.mv{background:var(--cream);border:2px solid var(--ink);border-radius:16px;padding:14px;text-align:center}
+.mv .mvv{font-family:'Baloo 2';font-weight:800;font-size:1.7rem;color:var(--orange)}
+.mv .mvv small{font-size:.65rem;color:var(--ink-soft);font-weight:700}
+.mv .mvp{font-weight:700;font-size:.9rem;margin-top:4px;line-height:1.2}
+.mv .mvc{font-size:.72rem;color:var(--ink-soft);margin-top:2px}
+.stars{color:#FFB400;letter-spacing:2px;font-size:1.5rem}
+.parent-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:760px){.parent-grid{grid-template-columns:repeat(2,1fr)}}
+.pcell{background:var(--cream);border:2px solid var(--line);border-radius:12px;padding:9px 12px;font-size:.84rem;color:var(--ink-soft)}
+.pcell b{color:var(--ink);font-family:'Baloo 2';margin-right:4px}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ptable{width:100%;border-collapse:collapse;margin-top:6px;font-size:.85rem;min-width:560px}
+.ptable th{background:var(--ink);color:#fff;padding:9px 8px;font-family:'Baloo 2';font-weight:700;font-size:.78rem;text-align:right;white-space:nowrap}
+.ptable th:first-child,.ptable th:nth-child(2){text-align:left}
+.ptable td{padding:9px 8px;border-bottom:1px dashed var(--line);text-align:right;white-space:nowrap}
+.ptable td.l{text-align:left}
+.ptable td.num{font-family:'Baloo 2';font-weight:700}
+.ptable tbody tr:hover{background:var(--cream)}
+.ptable .cn{font-weight:800}
+.heatbadge{display:inline-block;padding:2px 8px;border-radius:999px;font-family:'Baloo 2';font-weight:800;font-size:.78rem;color:#fff}
+.pcell{cursor:pointer;transition:.12s}
+.pcell:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink);border-color:var(--ink)}
+.pcell .arw{float:right;color:var(--pitch);font-weight:800}
+.ptable tbody tr{cursor:pointer}
+.cobiz{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.9rem;line-height:1.7;margin-top:4px}
+.flame-legend{margin-top:22px;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:12px 16px;box-shadow:4px 4px 0 var(--ink);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.8rem;font-weight:700}
+.flame-legend b{font-family:'Baloo 2'}
+.flame-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:14px;margin-top:16px}
+.flamecard{background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:14px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:.14s}
+.flamecard:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.flamecard .cbar{height:7px;border-radius:6px;margin-bottom:9px}
+.flamecard .fc-club{font-family:'Baloo 2';font-weight:800;font-size:1.05rem;line-height:1.15}
+.flamecard .fc-club span{font-weight:700;font-size:.74rem;color:var(--ink-soft)}
+.flamecard .fc-flames{margin:8px 0 4px;line-height:1}
+.flamecard .fc-num{font-family:'Baloo 2';font-weight:800;font-size:1.45rem}
+.flamecard .fc-num small{font-size:.6rem;color:var(--ink-soft);font-weight:700}
+.coheat{background:linear-gradient(135deg,#FFF1DA,#FFE1C0);border:2.5px solid var(--ink);border-radius:16px;padding:16px;text-align:center;box-shadow:3px 3px 0 var(--ink)}
+.coscale{background:linear-gradient(135deg,#EAF3FF,#DAEAFF);border:2.5px solid var(--ink);border-radius:16px;padding:14px;box-shadow:3px 3px 0 var(--ink)}
+.cs-big{font-family:'Baloo 2';font-weight:800;font-size:1.5rem;color:#2b6fd6;line-height:1}
+.cs-sub{font-size:.8rem;color:var(--ink-soft);margin-top:4px;line-height:1.5}
+.pl-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.pl-label{width:76px;font-weight:800;font-size:.82rem;flex-shrink:0}
+.pl-track{flex:1;background:var(--cream);border:2px solid var(--ink);border-radius:999px;height:20px;overflow:hidden}
+.pl-fill{height:100%;border-radius:999px;transition:width .5s}
+.pl-val{width:120px;text-align:right;font-family:'Baloo 2';font-weight:800;font-size:.9rem;flex-shrink:0}
+.pl-val small{font-size:.66rem;color:var(--ink-soft)}
+.pl-note{background:#FFF6E9;border:2px dashed var(--yellow);border-radius:12px;padding:9px 12px;font-size:.83rem;margin-top:10px;line-height:1.6}
+.cosize{background:linear-gradient(135deg,#F1ECFF,#E6DEFF);border:2.5px solid var(--ink);border-radius:16px;padding:14px;box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;gap:14px}
+.cosize .cs-emoji{font-size:2.6rem;flex-shrink:0}
+.cosize .tier{font-family:'Baloo 2';font-weight:800;font-size:1.2rem}
+.cosize .rev{font-family:'Baloo 2';font-weight:800;font-size:1.5rem;color:#6b4cff;line-height:1.1}
+.cosize .kind{font-size:.8rem;color:var(--ink-soft);margin-top:2px}
+.coearn{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.coearn .h{font-family:'Baloo 2';font-weight:800;font-size:1rem}
+.costab{border:2.5px solid var(--ink);border-radius:16px;padding:13px 15px;box-shadow:3px 3px 0 var(--ink)}
+.costab .lv{font-family:'Baloo 2';font-weight:800;font-size:1.15rem}
+.costab .note{font-size:.83rem;color:var(--ink-soft);margin-top:4px;line-height:1.6}
+.mech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px;margin-top:14px}
+.mech{background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:14px;box-shadow:4px 4px 0 var(--ink)}
+.mech .mi{font-size:1.7rem;line-height:1}
+.mech .mt{font-family:'Baloo 2';font-weight:800;font-size:1rem;margin-top:5px}
+.mech .md{font-size:.82rem;color:var(--ink-soft);margin-top:4px;line-height:1.55}
+.tscroll2{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:6px}
+.ttable{width:100%;border-collapse:collapse;font-size:.85rem;min-width:660px}
+.ttable th{background:var(--ink);color:#fff;font-family:'Baloo 2';font-weight:700;font-size:.75rem;padding:8px;text-align:left;white-space:nowrap}
+.ttable td{padding:9px 8px;border-bottom:1px dashed var(--line);vertical-align:top}
+.ttable tbody tr:hover{background:var(--cream)}
+.ttable .pl{font-weight:800;white-space:nowrap}
+.ttable .fee{white-space:nowrap;font-family:'Baloo 2';font-weight:700}
+.tbadge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:800;color:#fff;font-family:'Baloo 2';white-space:nowrap}
+.dir{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.68rem;font-weight:800;white-space:nowrap;margin-right:6px}
+.rumor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px;margin-top:14px}
+.rumor{background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:14px;box-shadow:4px 4px 0 var(--ink)}
+.rumor .rp{font-family:'Baloo 2';font-weight:800;font-size:1.05rem}
+.rumor .rc{font-size:.74rem;color:var(--ink-soft)}
+.rumor .rv{font-family:'Baloo 2';font-weight:800;font-size:1.15rem;color:var(--orange);margin:6px 0 2px}
+.rumor .rn{font-size:.8rem;color:var(--ink-soft);line-height:1.55}
+.rumor-warn{background:#FFEAF0;border:2px dashed var(--pink);border-radius:12px;padding:9px 13px;font-size:.82rem;font-weight:700;margin-top:6px}
+.t26board{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+@media(max-width:640px){.t26board{grid-template-columns:1fr}}
+.t26col{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;box-shadow:4px 4px 0 var(--ink)}
+.t26h{font-family:'Baloo 2';font-weight:800;font-size:1rem;padding:5px 9px;border-radius:9px;margin-bottom:8px}
+.t26h.in{background:#DFF3E6;color:#0B8F52}
+.t26h.out{background:#FFE0EA;color:#c81e5b}
+.t26row{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px dashed var(--line);font-size:.85rem}
+.t26pos{font-size:.64rem;font-weight:800;color:#fff;background:var(--ink);border-radius:6px;padding:1px 5px;flex-shrink:0;width:26px;text-align:center}
+.t26name{font-weight:800}
+.t26club{color:var(--ink-soft);font-size:.76rem;margin-left:auto;white-space:nowrap}
+.t26b{font-family:'Baloo 2';font-weight:800;font-size:.64rem;color:#fff;padding:1px 7px;border-radius:999px;flex-shrink:0}
+.t26empty{color:var(--ink-soft);padding:8px 2px;font-size:.85rem}
+#t26ctrl .chip{font-size:.82rem;padding:6px 12px}
+.plink{cursor:pointer;border-bottom:2px dotted #4C8DFF;transition:.12s}
+.plink:hover{color:#2b6fd6;background:#EAF3FF;border-radius:4px}
+.plmv{background:#FFF6E9;border:2px dashed var(--yellow);border-radius:12px;padding:10px 12px;font-size:.9rem}
+.plmv b{font-family:'Baloo 2';font-size:1.25rem;color:var(--orange);margin-left:4px}
+.plbar{height:12px;background:var(--cream);border:2px solid var(--ink);border-radius:999px;overflow:hidden;margin-top:6px}
+.plbar>div{height:100%;background:linear-gradient(90deg,#FFC948,#FF8A3D);border-radius:999px}
+.plnote2{display:block;font-size:.72rem;color:var(--ink-soft);margin-top:5px}
+.plchip{display:inline-block;background:var(--cream);border:2px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.8rem;font-weight:700;margin:3px 4px 0 0}
+#plAvatar svg{width:90px;height:auto}
+.plsec{display:flex;gap:8px;padding:8px 2px;border-bottom:1px dashed var(--line);font-size:.85rem}
+.plsec .pl-l{flex-shrink:0;width:118px;font-weight:800;color:var(--ink)}
+.plsec .pl-v{flex:1;color:var(--ink-soft);line-height:1.55}
+.plstats{display:flex;gap:10px;margin-top:6px}
+.ps{flex:1;background:var(--cream);border:2px solid var(--ink);border-radius:12px;padding:8px 4px;text-align:center}
+.psv{font-family:'Baloo 2';font-weight:800;font-size:1.5rem;line-height:1}
+.psl{font-size:.7rem;color:var(--ink-soft);font-weight:700;margin-top:3px}
+.plstyle{background:linear-gradient(135deg,#EAF7F0,#D8F0E4);border:2px solid var(--pitch);border-radius:12px;padding:10px 13px;font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.6}
+.star-row{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-soft);margin-top:6px}
+.card-stars{font-size:.85rem;color:#FFB400;letter-spacing:1px;margin-top:6px}
+.note-card{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.note-card .nt{font-weight:800;font-size:.82rem;color:var(--ink);display:flex;gap:6px;align-items:center}
+.note-card .nb{font-size:.86rem;color:var(--ink-soft);margin-top:3px}
+.topics-band{background:linear-gradient(160deg,#FFF1DA 0%,#FFE7CE 100%);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);position:relative;overflow:hidden}
+.topic-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px}
+@media(max-width:960px){.topic-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.topic-grid{grid-template-columns:1fr}}
+.topic{background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;padding:16px;box-shadow:5px 5px 0 var(--ink);position:relative}
+.topic .ill{height:92px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.topic .ill svg{height:92px;width:auto}
+.topic .tv{font-family:'Baloo 2';font-weight:800;font-size:1.45rem;color:var(--ink);line-height:1.05}
+.topic .tv.neg{color:var(--pink)}
+.topic .tt{font-weight:800;font-size:.95rem;margin-top:6px}
+.topic .tb{font-size:.8rem;color:var(--ink-soft);margin-top:4px;line-height:1.5}
+.topic .yr{position:absolute;top:10px;right:12px;font-family:'Baloo 2';font-weight:800;font-size:.72rem;color:#fff;background:var(--ink);padding:2px 9px;border-radius:999px}
+.deco-coin{position:absolute;opacity:.5;pointer-events:none}
+.eyebrow-ill{display:inline-flex;align-items:center;gap:10px}
+.eyebrow-ill svg{height:34px;width:34px;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav><div class="wrap">
+  <div class="brand">
+    <svg class="ball" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#fff" stroke="#243447" stroke-width="2.5"/>
+      <path d="M20 8l6 4.5-2.3 7h-7.4L14 12.5z" fill="#243447"/>
+      <path d="M20 8v4M8.5 16l4 2.8M31.5 16l-4 2.8M13 32l2-6M27 32l-2-6" stroke="#243447" stroke-width="2" fill="none"/></svg>
+    Jリーグ・マネー図鑑
+  </div>
+  <div class="nav-links">
+    <a class="navlink" href="#league">リーグ全体</a>
+    <a class="navlink" href="#trend">5年の推移</a>
+    <a class="navlink" href="#topics">会計トピ</a>
+    <a class="navlink" href="#ranking">ランキング</a>
+    <a class="navlink" href="#wage">人件費</a>
+    <a class="navlink" href="#result">お金と成績</a>
+    <a class="navlink" href="#transfer">移籍</a>
+    <a class="navlink" href="#clubs">クラブ図鑑</a>
+  </div>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero"><div class="wrap hero-grid">
+  <div>
+    <span class="eyebrow">2024年度 決算まるわかり</span>
+    <h1>数字で観る、<br><span class="hl">Jリーグの"経営"</span>。</h1>
+    <p class="sub">ゴールの裏側には、収益と支出のドラマがある。J1全20クラブの財務諸表を、イラストとグラフでやさしく読み解くサイトです。</p>
+    <div>
+      <a class="cta" href="#ranking">ランキングを見る ⚽</a>
+      <a class="cta ghost" href="#clubs">クラブ図鑑へ</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <svg class="float" viewBox="0 0 420 340" width="100%">
+      <!-- stadium -->
+      <ellipse cx="210" cy="250" rx="185" ry="60" fill="#12B36A" stroke="#243447" stroke-width="3"/>
+      <ellipse cx="210" cy="250" rx="120" ry="36" fill="#0B8F52" stroke="#243447" stroke-width="2.5"/>
+      <line x1="210" y1="214" x2="210" y2="286" stroke="#fff" stroke-width="2"/>
+      <circle cx="210" cy="250" r="15" fill="none" stroke="#fff" stroke-width="2"/>
+      <!-- goal -->
+      <rect x="150" y="228" width="16" height="20" fill="none" stroke="#fff" stroke-width="2"/>
+      <rect x="254" y="228" width="16" height="20" fill="none" stroke="#fff" stroke-width="2"/>
+      <!-- coins stack -->
+      <g>
+        <ellipse cx="330" cy="235" rx="34" ry="12" fill="#FFC948" stroke="#243447" stroke-width="2.5"/>
+        <rect x="296" y="212" width="68" height="23" fill="#FFC948" stroke="#243447" stroke-width="2.5"/>
+        <ellipse cx="330" cy="212" rx="34" ry="12" fill="#FFD86B" stroke="#243447" stroke-width="2.5"/>
+        <text x="330" y="218" font-size="15" text-anchor="middle" font-family="Baloo 2" font-weight="800" fill="#243447">¥</text>
+      </g>
+      <!-- floating coin -->
+      <g class="float" style="animation-delay:.6s">
+        <circle cx="88" cy="120" r="30" fill="#FFC948" stroke="#243447" stroke-width="3"/>
+        <text x="88" y="131" font-size="26" text-anchor="middle" font-family="Baloo 2" font-weight="800" fill="#243447">¥</text>
+      </g>
+      <!-- ball -->
+      <g class="float" style="animation-delay:1.2s">
+        <circle cx="300" cy="95" r="38" fill="#fff" stroke="#243447" stroke-width="3"/>
+        <path d="M300 70l12 9-4.5 14h-15L288 79z" fill="#243447"/>
+        <path d="M300 70v-8M275 84l9 6M325 84l-9 6M287 128l4-13M313 128l-4-13" stroke="#243447" stroke-width="2.5" fill="none"/>
+      </g>
+      <!-- chart bars -->
+      <g>
+        <rect x="150" y="150" width="20" height="45" rx="4" fill="#FF5C8A" stroke="#243447" stroke-width="2.5"/>
+        <rect x="176" y="120" width="20" height="75" rx="4" fill="#4C8DFF" stroke="#243447" stroke-width="2.5"/>
+        <rect x="202" y="95" width="20" height="100" rx="4" fill="#8A6BFF" stroke="#243447" stroke-width="2.5"/>
+        <rect x="228" y="135" width="20" height="60" rx="4" fill="#FF8A3D" stroke="#243447" stroke-width="2.5"/>
+      </g>
+    </svg>
+  </div>
+</div></header>
+
+<!-- LEAGUE OVERVIEW -->
+<section id="league" class="section-alt"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="96" rx="34" ry="11" fill="#FFC948" stroke="#243447" stroke-width="3"/><rect x="26" y="70" width="68" height="26" fill="#FFC948" stroke="#243447" stroke-width="3"/><ellipse cx="60" cy="70" rx="34" ry="11" fill="#FFD86B" stroke="#243447" stroke-width="3"/><rect x="30" y="48" width="60" height="22" fill="#FFC948" stroke="#243447" stroke-width="3"/><ellipse cx="60" cy="48" rx="30" ry="10" fill="#FFD86B" stroke="#243447" stroke-width="3"/><text x="60" y="53" font-size="16" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text><circle cx="94" cy="30" r="13" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="94" y="35" font-size="13" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text></svg>
+  <span class="eyebrow">まずは全体像</span>
+  <h2 class="title">Jリーグ全体は、いま"史上最高"の稼ぎ 💰</h2>
+  <p class="lead">2024年度、J1全20クラブの営業収益（売上高）合計は過去最高を更新。テレビ放映権と地域スポンサーが支える、独特のビジネスモデルを持っています。</p>
+  <div class="stat-row" style="margin-top:26px">
+    <div class="stat"><span class="emoji">🏆</span><div class="k">1,164<small style="font-size:.9rem">億円</small></div><div class="l">J1全20クラブの<br>営業収益合計</div></div>
+    <div class="stat"><div class="k pink">58<small style="font-size:.9rem">億円</small></div><div class="l">1クラブあたり<br>平均売上高</div></div>
+    <div class="stat"><div class="k blue">2,395<small style="font-size:.9rem">億円</small></div><div class="l">DAZN放映権契約<br>（2023〜33年の11年総額）</div></div>
+    <div class="stat"><div class="k orange">10<small style="font-size:.9rem">年目</small></div><div class="l">明治安田が<br>タイトルパートナー</div></div>
+  </div>
+  <p class="lead" style="margin-top:22px;max-width:820px">DAZNとの放映権料は<b>年間約208億円</b>にのぼり、これがリーグの事業収入の約7割を占めます。ここから各クラブへ「配分金」として分配され、成績上位クラブには"理念強化配分金"（通称DAZNマネー）が傾斜配分される仕組みです。</p>
+</div></section>
+
+<!-- TREND (5 YEARS) -->
+<section id="trend"><div class="wrap">
+  <span class="eyebrow">2020→2024</span>
+  <h2 class="title">コロナ禍からの5年、V字回復 📈</h2>
+  <p class="lead">コロナ前の2019年、J1の平均営業収益は約50億円でした。それが2020年に約38億へ急落（無観客・入場制限）。そこからV字回復し、2024年はコロナ前を超えて過去最高、2025年も更新中です。ピンクの点が谷底の2020年。王者の変遷も一緒に振り返ってみましょう。</p>
+  <div class="panel" style="margin-top:24px"><div class="chart-box" style="height:420px"><canvas id="trendChart"></canvas></div></div>
+  <div class="ins-grid">
+    <div class="ins"><div class="ic">🦠</div><h3>2020：どん底</h3><p>平均営業収益は約50億→約38億へ急落（前年比▲11億超）。入場料が消え、多くのクラブが赤字に沈みました。連覇中だった川崎フロンターレが独走で優勝。</p></div>
+    <div class="ins"><div class="ic">📈</div><h3>2022-23：回復</h3><p>観客が戻り、平均は46→52億円へ。2023年はリーグ全体（全60クラブ）で過去最高の1,517億円を記録。王者は横浜FM、そして神戸へ。</p></div>
+    <div class="ins"><div class="ic">🚀</div><h3>2024：最高更新</h3><p>J1平均は58億円、合計1,165億円でいずれも過去最高。新スタジアム・DAZN配分・スポンサー拡大が追い風に。神戸が連覇を達成。</p></div>
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:12px">※クラブ数が年により18〜20と変わるため、比較しやすいよう「1クラブあたり平均営業収益」で表示。2019年はコロナ前の水準（史上最高の神戸114億を含む）。2025年は先行発表（一部クラブを除く）の速報値。</p>
+</div></section>
+
+<!-- ACCOUNTING TOPICS -->
+<section id="topics" class="topics-band"><div class="wrap">
+  <svg class="deco-coin" style="top:20px;left:-16px;width:70px;height:70px" viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="30" y="37" font-size="22" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text></svg>
+  <svg class="deco-coin" style="bottom:16px;right:-14px;width:58px;height:58px;transform:rotate(12deg)" viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="#FFD86B" stroke="#243447" stroke-width="3"/><text x="30" y="37" font-size="20" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text></svg>
+  <span class="eyebrow">数字の裏の物語</span>
+  <h2 class="title">会計トピックス 🧾 ユニークな事件簿</h2>
+  <p class="lead">決算書には、ドラマがある。人件費が売上を超えたり、資本金を一気に減らしたり——J1で起きた"会計的に面白い出来事"を、数字とイラストで拾い集めました。</p>
+  <div class="topic-grid">
+
+   <div class="topic"><span class="yr">2020</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><path d="M45 16v10" stroke="#243447" stroke-width="3"/><circle cx="45" cy="13" r="5" fill="#FFC948" stroke="#243447" stroke-width="2.5"/>
+     <line x1="20" y1="30" x2="70" y2="30" stroke="#243447" stroke-width="3"/>
+     <circle cx="27" cy="58" r="16" fill="#9b1e2f" stroke="#243447" stroke-width="3"/><text x="27" y="63" font-size="15" text-anchor="middle" fill="#fff" font-family="Baloo 2" font-weight="800">¥</text>
+     <path d="M20 30l7 12h-14z" fill="#FFD86B" stroke="#243447" stroke-width="2.5"/>
+     <circle cx="66" cy="44" r="10" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="66" y="48" font-size="10" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text>
+     <path d="M70 30l6 10h-12z" fill="#FFD86B" stroke="#243447" stroke-width="2.5"/></svg></div>
+    <div class="tv neg">64億 &gt; 47億</div><div class="tt">人件費が売上を超えた</div>
+    <div class="tb">神戸。イニエスタらを擁し、人件費64億が売上47億を上回る異例の年。前年2019は史上最高の売上114億も記録。</div></div>
+
+   <div class="topic"><span class="yr">2024</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><ellipse cx="45" cy="66" rx="34" ry="11" fill="#12B36A" stroke="#243447" stroke-width="3"/><ellipse cx="45" cy="66" rx="18" ry="5" fill="#0B8F52" stroke="#243447" stroke-width="2"/>
+     <path d="M16 66V50M74 66V50M16 50h58" stroke="#243447" stroke-width="3" fill="none"/>
+     <path d="M62 40l12-12m0 0h-9m9 0v9" stroke="#FF5C8A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+     <rect x="30" y="34" width="8" height="16" rx="2" fill="#4C8DFF" stroke="#243447" stroke-width="2.5"/>
+     <rect x="42" y="26" width="8" height="24" rx="2" fill="#FFC948" stroke="#243447" stroke-width="2.5"/></svg></div>
+    <div class="tv">入場料 ×3.2</div><div class="tt">新スタジアム革命</div>
+    <div class="tb">広島。エディオンP.W.開業で入場料が6.3億→20.0億に急増、売上もほぼ倍増の80億へ。</div></div>
+
+   <div class="topic"><span class="yr">〜2023</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><circle cx="45" cy="46" r="24" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="45" y="53" font-size="24" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text>
+     <g stroke="#243447" stroke-width="3" fill="#fff"><circle cx="20" cy="20" r="7"/><circle cx="20" cy="34" r="7"/><path d="M26 22L64 44M26 32L64 48" stroke="#243447" stroke-width="3"/></g>
+     <path d="M60 40l14-6-3 8 5 6-9-1z" fill="#FF5C8A" stroke="#243447" stroke-width="2.5"/></svg></div>
+    <div class="tv">36億 → 0.5億</div><div class="tt">資本金を"減資"して赤字一掃</div>
+    <div class="tb">京都。巨額の資本金を無償減資し、累積赤字（欠損）を会計的に穴埋めして再スタート。</div></div>
+
+   <div class="topic"><span class="yr">2020</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><rect x="22" y="40" width="46" height="30" rx="4" fill="#FF8A3D" stroke="#243447" stroke-width="3"/><rect x="18" y="30" width="54" height="14" rx="4" fill="#FFC948" stroke="#243447" stroke-width="3"/>
+     <line x1="45" y1="30" x2="45" y2="70" stroke="#243447" stroke-width="3"/>
+     <path d="M45 30c-4-12-18-10-14-2 2 5 14 2 14 2z" fill="#FF5C8A" stroke="#243447" stroke-width="2.5"/>
+     <path d="M45 30c4-12 18-10 14-2-2 5-14 2-14 2z" fill="#FF5C8A" stroke="#243447" stroke-width="2.5"/>
+     <text x="45" y="60" font-size="14" text-anchor="middle" fill="#fff" font-family="Baloo 2" font-weight="800">¥</text></svg></div>
+    <div class="tv">＋52億</div><div class="tt">特別利益で債務超過を回避</div>
+    <div class="tb">神戸。親会社支援などの特別利益が最大52億円。本業赤字でも純資産をプラスに保った。</div></div>
+
+   <div class="topic"><span class="yr">2020</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><polyline points="16,26 34,40 50,34 74,64" fill="none" stroke="#FF5C8A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M74 64v-14m0 14h-14" stroke="#FF5C8A" stroke-width="4" fill="none" stroke-linecap="round"/>
+     <circle cx="16" cy="26" r="4" fill="#243447"/><circle cx="50" cy="34" r="4" fill="#243447"/>
+     <circle cx="30" cy="72" r="6" fill="#fff" stroke="#243447" stroke-width="2.5"/><path d="M30 68v-2M27 74l-1 2M33 74l1 2" stroke="#243447" stroke-width="1.5"/></svg></div>
+    <div class="tv neg">▲112億</div><div class="tt">コロナ禍・リーグ全体で営業赤字</div>
+    <div class="tb">2020年、J1全クラブ合算の営業損益が▲112億円。無観客・入場制限がクラブ経営を直撃した。</div></div>
+
+   <div class="topic"><span class="yr">2020→24</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><path d="M45 14c10 8 14 22 14 34 0 8-4 16-14 24-10-8-14-16-14-24 0-12 4-26 14-34z" fill="#003f98" stroke="#243447" stroke-width="3"/>
+     <circle cx="45" cy="40" r="7" fill="#fff" stroke="#243447" stroke-width="2.5"/><text x="45" y="44" font-size="8" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text>
+     <path d="M31 64l-8 12M59 64l8 12M45 72v10" stroke="#FF8A3D" stroke-width="4" stroke-linecap="round"/></svg></div>
+    <div class="tv">売上 ×4.6</div><div class="tt">4年で売上が4.6倍</div>
+    <div class="tb">町田。サイバーエージェント体制で売上12.5億→57.5億に急成長し、2024年にJ1初挑戦で3位。</div></div>
+
+   <div class="topic"><span class="yr">2024</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><path d="M14 52q31 20 62 0" fill="none" stroke="#4C8DFF" stroke-width="3"/><path d="M14 62q31 20 62 0" fill="none" stroke="#4C8DFF" stroke-width="3"/>
+     <circle cx="45" cy="40" r="15" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="45" y="45" font-size="15" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text>
+     <path d="M38 60l4 6 4-6" fill="#FF5C8A" stroke="#243447" stroke-width="2"/></svg></div>
+    <div class="tv neg">純資産 ▲2.7億</div><div class="tt">債務超過という黄信号</div>
+    <div class="tb">福岡。累積赤字で自己資本がマイナスに。増資か黒字化での早期解消が経営の最大テーマ。</div></div>
+
+   <div class="topic"><span class="yr">2024〜</span>
+    <div class="ill"><svg viewBox="0 0 90 90"><circle cx="40" cy="40" r="20" fill="#fff" stroke="#243447" stroke-width="3"/><text x="40" y="46" font-size="18" text-anchor="middle" fill="#8A6BFF" font-family="Baloo 2" font-weight="800">¥</text>
+     <line x1="55" y1="55" x2="72" y2="72" stroke="#243447" stroke-width="5" stroke-linecap="round"/>
+     <path d="M28 34l6-6M28 40l10-10" stroke="#4C8DFF" stroke-width="2"/></svg></div>
+    <div class="tv">新科目</div><div class="tt">移籍のお金が"見える化"</div>
+    <div class="tb">開示制度が進化し「移籍補償金等収入／移籍関連費用」が独立科目に。売って稼ぐ経営が数字で見えるように。</div></div>
+
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:14px">※数値はJリーグ公式開示の各年度決算に基づく実績。金額はクラブ運営法人単体・概算表示。</p>
+</div></section>
+
+<!-- RANKING -->
+<section id="ranking" class="section-alt"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M40 24h40v14a20 20 0 0 1-40 0z" fill="#FFC948" stroke="#243447" stroke-width="3"/><path d="M40 28H28a10 10 0 0 0 12 12M80 28h12a10 10 0 0 1-12 12" fill="none" stroke="#243447" stroke-width="3"/><rect x="52" y="58" width="16" height="16" fill="#FFD86B" stroke="#243447" stroke-width="3"/><rect x="40" y="74" width="40" height="12" rx="3" fill="#FF8A3D" stroke="#243447" stroke-width="3"/><path d="M58 42l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" fill="#fff" stroke="#243447" stroke-width="1.5"/></svg>
+  <span class="eyebrow">クラブ対決</span>
+  <h2 class="title">お金のランキング 📊</h2>
+  <p class="lead">指標を切り替えて、20クラブを並べ替え。売上・人件費・入場料・スポンサー・利益まで、クラブの"体格"が見えてきます。</p>
+  <div class="controls" id="rankctrl"></div>
+  <div class="panel"><div class="chart-box" style="height:640px"><canvas id="rankChart"></canvas></div></div>
+  <p class="lead" style="font-size:.85rem;margin-top:12px">※単位は億円。マイナス（赤字）はピンクで表示。数値はクラブ運営法人単体の決算値。</p>
+</div></section>
+
+<!-- FLOW -->
+<section id="flow"><div class="wrap">
+  <span class="eyebrow">お金の流れ</span>
+  <h2 class="title">クラブの財布はどうなってる? 🧧</h2>
+  <p class="lead">収入は主に5つの蛇口から。そして最大の支出は"選手の人件費"。J1平均のお金の流れを追ってみましょう。</p>
+  <div class="flow">
+    <div class="flow-box"><div class="fi">🤝</div><div class="ft">スポンサー</div><div class="fd">平均24.5億円 / 42%</div></div>
+    <div class="arrow">＋</div>
+    <div class="flow-box"><div class="fi">🎟️</div><div class="ft">入場料</div><div class="fd">平均10.9億円 / 19%</div></div>
+    <div class="arrow">＋</div>
+    <div class="flow-box"><div class="fi">📺</div><div class="ft">配分金ほか</div><div class="fd">放映権・物販・移籍</div></div>
+  </div>
+  <div class="flow" style="margin-top:14px">
+    <div class="flow-box" style="border-color:var(--pink);box-shadow:4px 4px 0 var(--pink)"><div class="fi">👟</div><div class="ft">選手人件費</div><div class="fd">平均20.9億円が出ていく</div></div>
+    <div class="arrow" style="color:var(--pink)">→</div>
+    <div class="flow-box"><div class="fi">🏟️</div><div class="ft">試合・運営費</div><div class="fd">スタジアム・遠征</div></div>
+    <div class="arrow" style="color:var(--pink)">→</div>
+    <div class="flow-box" style="border-color:var(--pitch);box-shadow:4px 4px 0 var(--pitch)"><div class="fi">⚖️</div><div class="ft">残ったら黒字</div><div class="fd">J1平均 営業利益+0.8億円</div></div>
+  </div>
+  <div class="panel" style="margin-top:34px">
+    <h3 style="font-size:1.2rem;margin-bottom:6px">J1全体の収益内訳（合計1,164億円）</h3>
+    <p class="lead" style="font-size:.9rem;margin-bottom:10px">スポンサー収入が全体の4割超。日本のクラブは"地域の企業に支えられる"構造が特徴です。</p>
+    <div class="chart-box" style="height:340px;max-width:620px;margin:0 auto"><canvas id="mixChart"></canvas></div>
+  </div>
+</div></section>
+
+<!-- WAGE -->
+<section id="wage" class="section-alt"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M30 54c0-8 6-14 16-14 12 0 14 8 26 8 8 0 12 6 12 12v10H30z" fill="#8A6BFF" stroke="#243447" stroke-width="3"/><rect x="30" y="70" width="54" height="10" rx="4" fill="#243447"/><path d="M46 40v-8" stroke="#243447" stroke-width="3"/><circle cx="92" cy="40" r="13" fill="#FFC948" stroke="#243447" stroke-width="3"/><text x="92" y="45" font-size="13" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text></svg>
+  <span class="eyebrow">勝負とお金</span>
+  <h2 class="title">人件費 × 売上高、そのバランス 👟</h2>
+  <p class="lead">強さは、選手にどれだけ投資できるかと直結します。横軸が売上、縦軸が人件費。<b>破線は「人件費比率40%」の目安ライン</b>で、線より上のクラブは売上の4割以上を選手人件費に投じる"積極投資型"。バブルの大きさは営業利益の規模、ピンクは営業赤字。</p>
+  <div class="panel" style="margin-top:24px"><div class="chart-box" style="height:520px"><canvas id="scatChart"></canvas></div></div>
+  <div class="ins-grid">
+    <div class="ins"><div class="ic">👑</div><h3>人件費キング・浦和</h3><p>トップチーム人件費31.9億円はリーグ最多。売上102億円も断トツで、"ビッグクラブ"の経営規模を見せつけます。</p></div>
+    <div class="ins"><div class="ic">🚀</div><h3>昇格組・町田の攻め</h3><p>売上57.5億円のうちスポンサー40.4億円。親会社サイバーエージェントの支援で人件費を一気に24.8億円まで引き上げました。</p></div>
+    <div class="ins"><div class="ic">🏟️</div><h3>新スタ効果・広島</h3><p>新スタジアム開業で入場料が20.0億円に急増、売上80.4億円。営業利益+5.7億円はリーグ屈指の稼ぎっぷり。</p></div>
+  </div>
+</div></section>
+
+<!-- RESULT / CORRELATION -->
+<section id="result"><div class="wrap">
+  <span class="eyebrow">お金は勝利を買えるか?</span>
+  <h2 class="title">人件費と順位の関係 🏅</h2>
+  <p class="lead">「選手にお金をかけたクラブほど強い」は本当か? 横軸に人件費、縦軸に最終順位（上ほど上位）をとると、右上がりの傾向がはっきり見えます。2020〜2024の5シーズンを切り替えて、"コスパの主役"や"期待外れ"の変化を確かめてください。</p>
+  <div class="controls" id="resultctrl">
+    <button class="chip active" data-year="2024">2024</button>
+    <button class="chip" data-year="2023">2023</button>
+    <button class="chip" data-year="2022">2022</button>
+    <button class="chip" data-year="2021">2021</button>
+    <button class="chip" data-year="2020">2020</button>
+  </div>
+  <div class="panel"><div class="chart-box" style="height:520px"><canvas id="resultChart"></canvas></div></div>
+  <div class="stat-row" style="margin-top:22px">
+    <div class="stat"><div class="k" id="corrK">–</div><div class="l">人件費と順位の<br>相関係数（この年度）</div></div>
+    <div class="stat"><div class="k blue" id="corrTop">–</div><div class="l">人件費1位クラブの<br>最終順位</div></div>
+    <div class="stat"><div class="k pink" id="corrCP">–</div><div class="l">コスパ最強<br>（人件費の順位を最も上回った）</div></div>
+    <div class="stat"><div class="k orange" id="corrUP">–</div><div class="l">期待外れ<br>（人件費の順位を最も下回った）</div></div>
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:12px">相関係数は「人件費」と「勝点」の関係の強さ（1に近いほどお金が成績に直結）。コスパ／期待外れは、人件費順位と最終順位の差から算出。</p>
+</div></section>
+
+<!-- TRANSFER / MARKET VALUE -->
+<section id="transfer" class="section-alt"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M24 46h50m0 0l-12-10m12 10l-12 10" fill="none" stroke="#12B36A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M96 74H46m0 0l12-10m-12 10l12 10" fill="none" stroke="#FF5C8A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="92" cy="34" r="10" fill="#FFC948" stroke="#243447" stroke-width="2.5"/><text x="92" y="38" font-size="10" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text></svg>
+  <span class="eyebrow">選手という資産</span>
+  <h2 class="title">移籍マーケットとお金 💸</h2>
+  <p class="lead">サッカーの一番の関心事、移籍マーケット。まず<b>仕組み（完全移籍・レンタル・フリーなど）</b>を押さえ、<b>過去の主な移籍と費用・その後</b>、クラブの<b>移籍収支</b>、<b>市場価値</b>、そして<b>最新のうわさ</b>まで、順番に見ていきます。</p>
+    <h3 style="font-size:1.3rem;margin:30px 0 2px">① 移籍のしくみ（まずは用語から）📖</h3>
+  <p class="lead" style="font-size:.9rem;margin-bottom:4px">「完全移籍」と「レンタル」の違いなど、まぎらわしい用語をやさしく整理します。</p>
+  <div class="mech-grid">
+    <div class="mech"><div class="mi">⚽</div><div class="mt">完全移籍</div><div class="md">移籍金を払い、選手の保有権ごと獲得。新たに契約を結ぶ最も一般的な形。</div></div>
+    <div class="mech"><div class="mi">🔁</div><div class="mt">期限付き移籍（レンタル）</div><div class="md">期間を決めて“借りる”。給料の負担割合や買い取り条件を付けることも。保有権は元クラブに残る。</div></div>
+    <div class="mech"><div class="mi">🌱</div><div class="mt">育成型期限付き移籍</div><div class="md">若手に出場機会を与えるためのレンタル（Jリーグ独自の枠組み）。</div></div>
+    <div class="mech"><div class="mi">🆓</div><div class="mt">フリー（移籍金ゼロ）</div><div class="md">契約満了で移籍金なしに移籍（ボスマン）。イニエスタの来日もこれ。</div></div>
+    <div class="mech"><div class="mi">🛒</div><div class="mt">買い取りオプション／義務</div><div class="md">レンタル中に完全移籍“できる／しなければならない”条件。金額を先に決めておく。</div></div>
+    <div class="mech"><div class="mi">🎓</div><div class="mt">育成補償金・連帯貢献金</div><div class="md">若手を育てた元クラブや学校に、移籍金の一部が支払われる仕組み（古橋の移籍で母校等へ）。</div></div>
+    <div class="mech"><div class="mi">🪟</div><div class="mt">移籍ウインドウ</div><div class="md">移籍できる期間（夏・冬）。2026/27シーズンから秋春制へ移行し、欧州と日程が揃う。</div></div>
+    <div class="mech"><div class="mi">📒</div><div class="mt">会計での扱い</div><div class="md">決算では「移籍補償金等収入」「移籍関連費用」に計上。これが下の“移籍収支”の元データ。</div></div>
+  </div>
+
+  <h3 style="font-size:1.3rem;margin:34px 0 2px">② 過去の主な移籍と、その後 🌍</h3>
+  <p class="lead" style="font-size:.9rem;margin-bottom:4px"><span class="dir" style="background:#FFE0EA;color:#c81e5b">⬆ 海外へ</span> J→欧州、<span class="dir" style="background:#E7E0FF;color:#5a3ecf">⇄ J内</span> J1クラブ間、<span class="dir" style="background:#DFF3E6;color:#0B8F52">⬇ Jへ</span> 海外からJへ。直近の移籍を中心に、大型は過去も。移籍金は報道・推定を含みます。</p>
+  <div class="panel" style="padding:14px 16px"><div class="tscroll2"><table class="ttable">
+    <thead><tr><th>選手</th><th>移籍</th><th>年</th><th>種別</th><th>移籍金</th><th>その後</th></tr></thead>
+    <tbody><tr><td class="pl plink" onclick="openPlayer(this.textContent)">高井 幸大</td><td><span class="dir" style="background:#FFE0EA;color:#c81e5b">⬆ 海外へ</span>川崎F → トッテナム</td><td>2025</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:#0B8F52">約10億円</td><td style="min-width:180px">J→海外の歴代最高額。20歳でプレミアへ挑戦（その後ドイツへレンタル）。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">三笘 薫</td><td><span class="dir" style="background:#FFE0EA;color:#c81e5b">⬆ 海外へ</span>川崎F → ブライトン</td><td>2021</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:#0B8F52">約3.9億円</td><td style="min-width:180px">プレミアで飛躍。市場価値は約66億へ（15倍超）。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">古橋 亨梧</td><td><span class="dir" style="background:#FFE0EA;color:#c81e5b">⬆ 海外へ</span>神戸 → セルティック</td><td>2021</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:#0B8F52">約7億円</td><td style="min-width:180px">得点王に。2025年にレンヌへ約19億で再移籍。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">上田 綺世</td><td><span class="dir" style="background:#FFE0EA;color:#c81e5b">⬆ 海外へ</span>鹿島 → セルクル</td><td>2022</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:#0B8F52">約1.5億円</td><td style="min-width:180px">フェイエで量産、価値が約30倍に。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">渡辺 皓太</td><td><span class="dir" style="background:#E7E0FF;color:#5a3ecf">⇄ J内</span>横浜FM → 神戸</td><td>2026</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:var(--ink-soft)">非公開</td><td style="min-width:180px">王者・神戸が実績ある中盤を国内から補強。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">知念 慶</td><td><span class="dir" style="background:#E7E0FF;color:#5a3ecf">⇄ J内</span>鹿島 → 横浜FM</td><td>2026</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:var(--ink-soft)">非公開</td><td style="min-width:180px">J1で実績を積んだボランチが新天地へ。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">椎橋・三國</td><td><span class="dir" style="background:#E7E0FF;color:#5a3ecf">⇄ J内</span>名古屋 → 福岡</td><td>2026</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:var(--ink-soft)">非公開</td><td style="min-width:180px">名古屋の主力2枚が福岡へ（報道ベース）。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">大迫 勇也</td><td><span class="dir" style="background:#DFF3E6;color:#0B8F52">⬇ Jへ</span>ブレーメン → 神戸</td><td>2020</td><td><span class="tbadge" style="background:#12B36A">完全</span></td><td class="fee" style="color:var(--ink-soft)">非公開</td><td style="min-width:180px">日本代表FWが帰国し、神戸の得点源に。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">A.イニエスタ</td><td><span class="dir" style="background:#DFF3E6;color:#0B8F52">⬇ Jへ</span>バルセロナ → 神戸</td><td>2018</td><td><span class="tbadge" style="background:#8A6BFF">フリー</span></td><td class="fee" style="color:#8A6BFF">0円</td><td style="min-width:180px">世界的名手が来日。神戸の人件費急増の一因に。</td></tr><tr><td class="pl plink" onclick="openPlayer(this.textContent)">F.トーレス</td><td><span class="dir" style="background:#DFF3E6;color:#0B8F52">⬇ Jへ</span>ミラン → 鳥栖</td><td>2018</td><td><span class="tbadge" style="background:#8A6BFF">フリー</span></td><td class="fee" style="color:#8A6BFF">0円</td><td style="min-width:180px">世界的スターが鳥栖に。話題と集客に貢献。</td></tr></tbody>
+  </table></div></div>
+
+  <h3 style="font-size:1.3rem;margin:34px 0 2px">③ クラブ別・移籍収支（2024年度）💹</h3>
+  <p class="lead" style="font-size:.9rem;margin-bottom:4px">公式決算の「移籍補償金等収入 − 移籍関連費用」。プラスは“育てて売る”クラブ、マイナスは“補強に投資する”クラブ。</p>
+  <div class="panel" style="margin-top:22px"><div class="chart-box" style="height:560px"><canvas id="transferChart"></canvas></div></div>
+  <div class="ins-grid">
+    <div class="ins"><div class="ic">💰</div><h3>売って稼ぐ・鹿島</h3><p>移籍収支+6.5億はリーグ最大。メルカリ体制のもと、育成と移籍で利益を生む好循環。鳥栖(+2.5億)も売却型の代表格。</p></div>
+    <div class="ins"><div class="ic">🛒</div><h3>投資する・川崎</h3><p>移籍収支▲11.3億は最大の"買い越し"。町田(▲6.7億)やG大阪(▲5.5億)も大型補強型。成績への還元が問われます。</p></div>
+    <div class="ins"><div class="ic">📈</div><h3>市場価値という物差し</h3><p>J1全体のスカッド市場価値は約470億円（Transfermarkt推定）。1人平均は約6,800万円。移籍収入の源泉はここにあります。</p></div>
+  </div>
+  <div class="panel" style="margin-top:22px">
+    <h3 style="font-size:1.2rem;margin-bottom:4px">④ 主力選手の市場価値 TOP（2025年時点・参考）🌟</h3>
+    <p class="lead" style="font-size:.85rem;margin-bottom:14px">Transfermarktの推定値。為替や調子で変動する参考値です。</p>
+    <div class="mvgrid">
+      <div class="mv"><div class="mvv">5.8<small>億円</small></div><div class="mvp plink" onclick="openPlayer(this.textContent)">ラファエル・エリアス</div><div class="mvc">京都サンガ / FW</div></div>
+      <div class="mv"><div class="mvv">5.5<small>億円</small></div><div class="mvp plink" onclick="openPlayer(this.textContent)">川辺 駿</div><div class="mvc">サンフレッチェ広島 / MF</div></div>
+      <div class="mv"><div class="mvv">4.0<small>億円</small></div><div class="mvp plink" onclick="openPlayer(this.textContent)">相馬 勇紀</div><div class="mvc">FC町田ゼルビア / MF</div></div>
+      <div class="mv"><div class="mvv">3.6<small>億円</small></div><div class="mvp plink" onclick="openPlayer(this.textContent)">大迫 敬介</div><div class="mvc">サンフレッチェ広島 / GK</div></div>
+      <div class="mv"><div class="mvv">3.6<small>億円</small></div><div class="mvp plink" onclick="openPlayer(this.textContent)">マテウス・トゥーレル</div><div class="mvc">ヴィッセル神戸 / DF</div></div>
+    </div>
+  </div>
+    <h3 style="font-size:1.3rem;margin:34px 0 2px">⑤ 2026/27 確定移籍ボード（IN / OUT）🆕</h3>
+  <p class="lead" style="font-size:.9rem;margin-bottom:4px">来季の新戦力（<b style="color:#0B8F52">加入＝IN</b>）と退団（<b style="color:#c81e5b">OUT</b>）。クラブを選ぶと切り替わります。主な移籍の抜粋（2026年7月時点・公式/報道ベース）。</p>
+  <div style="font-size:.78rem;color:var(--ink-soft);margin:2px 0 8px">🔄 最終更新: <b id="t26updated">2026-07-14</b>（移籍情報）</div>
+  <div class="controls" id="t26ctrl"></div>
+  <div class="t26board" id="t26board"></div>
+
+  <h3 style="font-size:1.3rem;margin:34px 0 2px">⑥ 最新の移籍トピック（2026・報道ベース）🔮</h3>
+  <div class="rumor-grid">
+    <div class="rumor" style="grid-column:1/-1;background:linear-gradient(135deg,#F1ECFF,#E6DEFF)">
+      <div class="rp">🔄 国内でも“主力の争奪戦”が活発（2026）</div>
+      <div class="rn" style="margin-top:6px">上位クラブ同士が主力を引き抜き合う構図に。<b>神戸←渡辺皓太（横浜FM）</b>、<b>横浜FM←知念（鹿島）</b>、<b>福岡←椎橋・三國（名古屋）</b>など、かつてない“国内マーケットの活況”。優勝・ACL争いが激しいほどこの動きは強まります。</div>
+    </div>
+    <div class="rumor"><div class="rp plink" onclick="openPlayer(this.textContent)">鈴木 章斗</div><div class="rc">広島 / FW（22歳）</div><div class="rv">🌍 海外挑戦の呼び声</div><div class="rn">2季連続2桁得点。今夏の欧州移籍が注目される得点源。</div></div>
+    <div class="rumor"><div class="rp plink" onclick="openPlayer(this.textContent)">大迫 敬介</div><div class="rc">広島 / GK・日本代表</div><div class="rv">🌍 海外挑戦の呼び声</div><div class="rn">海外挑戦の可能性が指摘される正守護神。</div></div>
+    <div class="rumor"><div class="rp plink" onclick="openPlayer(this.textContent)">荒木 遼太郎</div><div class="rc">FC東京 / 攻撃的MF</div><div class="rv">🌍 欧州から関心</div><div class="rn">シント=トロイデン（ベルギー）が獲得オファーと報道。</div></div>
+    <div class="rumor" style="background:var(--cream)"><div class="rp">🍂 2026/27〜 秋春制へ</div><div class="rc">リーグ全体のトピック</div><div class="rv">移籍が加速か</div><div class="rn">移籍市場が欧州と揃い、国内外の移籍が動きやすくなる見込み。</div></div>
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:16px">※移籍収支は2024年度決算の実績値。市場価値・移籍金・うわさはTransfermarkt／CIESや各種報道に基づく推定・参考値（2025〜26年時点、変動あり）。</p>
+</div></section>
+
+<!-- CLUBS -->
+<section id="clubs"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path d="M60 22l30 10v22c0 20-14 32-30 40-16-8-30-20-30-40V32z" fill="#12B36A" stroke="#243447" stroke-width="3"/><path d="M60 40l16 6-6 12h-20l-6-12z" fill="#fff" stroke="#243447" stroke-width="2"/><path d="M60 40v-6M44 44l-6-4M76 44l6-4" stroke="#fff" stroke-width="2"/></svg>
+  <span class="eyebrow">全20クラブ</span>
+  <h2 class="title">クラブ経営図鑑 📁</h2>
+  <p class="lead">カードをタップすると、そのクラブの損益計算書・収益内訳・貸借対照表が開きます。並び順を切り替えてお気に入りを探そう。</p>
+  <div class="controls" id="sortctrl">
+    <button class="chip active" data-sort="rev">売上高順</button>
+    <button class="chip" data-sort="wage">人件費順</button>
+    <button class="chip" data-sort="netProfit">当期利益順</button>
+    <button class="chip" data-sort="gate">入場料順</button>
+    <button class="chip" data-sort="sponsor">スポンサー順</button>
+    <button class="chip" data-sort="starScore">経営力★順</button>
+  </div>
+  <div class="club-grid" id="clubGrid"></div>
+</div></section>
+
+<!-- SPONSOR -->
+<section id="sponsor"><div class="wrap">
+  <svg class="sec-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="44" r="20" fill="#FF5C8A" stroke="#243447" stroke-width="3"/><path d="M52 44l6 6 12-12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 84c6-10 16-10 22-4M90 84c-6-10-16-10-22-4" fill="none" stroke="#243447" stroke-width="3" stroke-linecap="round"/><circle cx="34" cy="74" r="7" fill="#4C8DFF" stroke="#243447" stroke-width="2.5"/><circle cx="86" cy="74" r="7" fill="#FFC948" stroke="#243447" stroke-width="2.5"/></svg>
+  <span class="eyebrow">支える人たち</span>
+  <h2 class="title">スポンサー & 放映権のはなし 📺</h2>
+  <p class="lead">Jリーグのお金は、大きく2層。<b>リーグが集めて配るお金</b>（放映権→配分金）と、<b>クラブが地元で集めるお金</b>（スポンサー）です。それぞれを深掘りします。</p>
+
+  <h3 style="font-size:1.3rem;margin:34px 0 4px">① 放映権：年208億円という"元栓" 📡</h3>
+  <p class="lead" style="margin-bottom:8px">DAZNとの11年契約（2023〜2033）は総額<b>約2,395億円</b>。年間<b>約208億円</b>がリーグに入り、Jリーグ事業収入の<b>約7割</b>を占める最大の収入源です。ここが太くなると、各クラブへの「配分金」も太くなります。</p>
+  <div class="flow" style="margin-top:18px">
+    <div class="flow-box"><div class="fi">📺</div><div class="ft">DAZN</div><div class="fd">放映権料 年 約208億円</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box" style="border-color:var(--pitch);box-shadow:4px 4px 0 var(--pitch)"><div class="fi">🏛️</div><div class="ft">Jリーグ</div><div class="fd">集約して再分配</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box"><div class="fi">⚽</div><div class="ft">60クラブ</div><div class="fd">配分金として受け取り</div></div>
+  </div>
+  <div class="stat-row" style="margin-top:22px">
+    <div class="stat"><span class="emoji">📡</span><div class="k">2,395<small style="font-size:.9rem">億円</small></div><div class="l">DAZN契約 総額<br>（2023〜33年／11年）</div></div>
+    <div class="stat"><div class="k blue">208<small style="font-size:.9rem">億円</small></div><div class="l">年間の放映権料<br>（2024年度予算）</div></div>
+    <div class="stat"><div class="k orange">約7<small style="font-size:.9rem">割</small></div><div class="l">リーグ事業収入に<br>占める放映権の比率</div></div>
+    <div class="stat"><div class="k pink">2015<small style="font-size:.9rem">〜</small></div><div class="l">明治安田が<br>タイトルパートナー</div></div>
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:12px">DAZNはJ1・J2を独占配信。J3も2024〜25年はDAZNが放映。近年は地上波での無料中継も増やし、ファンとの接点拡大を狙っています。</p>
+
+  <h3 style="font-size:1.3rem;margin:40px 0 4px">② 配分金：「均等」から「結果」へ 🔀</h3>
+  <p class="lead" style="margin-bottom:6px">2022年の成長戦略で、横並びの均等配分から、<b>成績・人気に応じた"結果配分"</b>中心へ段階的にシフト。上位クラブほど多く受け取れる仕組みに変わりました。</p>
+  <div class="ins-grid">
+    <div class="ins"><div class="ic">⚖️</div><h3>均等配分金</h3><p>全クラブ横並びの基礎額。<b>J1＝2.5億円</b>／J2＝1億円／J3＝0.2億円（1クラブあたり）。ここは変わらず全クラブの土台。</p></div>
+    <div class="ins"><div class="ic">🏆</div><h3>理念強化配分金</h3><p>2024年に新方式で再開。前年J1の<b>競技順位1〜9位（総額約16億）</b>＋<b>人気順位（DAZN視聴者数等）1〜9位（総額約5億）</b>。優勝級は約2.5億、最大2年で5億円。</p></div>
+    <div class="ins"><div class="ic">✂️</div><h3>見直しも</h3><p>2024年から<b>降格救済金は廃止</b>。ACLサポート配分金も4億→<b>0.5億</b>に縮小。「守り」より「攻め」に配分を寄せる方針です。</p></div>
+  </div>
+  <div class="panel" style="margin-top:24px">
+    <h3 style="font-size:1.15rem;margin-bottom:2px">クラブ別 Jリーグ配分金（2024年度・億円）</h3>
+    <p class="lead" style="font-size:.85rem;margin-bottom:10px">濃い部分が全クラブ一律の<b>均等配分2.5億</b>、薄い部分が<b>理念強化などの上乗せ分</b>。上位クラブほど"結果"で差がつきます。</p>
+    <div class="chart-box" style="height:560px"><canvas id="distChart"></canvas></div>
+  </div>
+
+  <h3 style="font-size:1.3rem;margin:40px 0 4px">③ スポンサー：クラブ収入の最大項目 🤝</h3>
+  <p class="lead" style="margin-bottom:6px">日本のクラブ収入で最も大きいのがスポンサー収入（J1平均 約25億／売上の約42%）。親会社・地元企業の支えが経営の土台です。欧州が放映権・入場料中心なのと対照的な"日本型"構造。</p>
+  <div class="panel" style="margin-top:16px">
+    <h3 style="font-size:1.1rem;margin-bottom:6px">スポンサー収入 TOP10（億円）</h3>
+    <div class="chart-box" style="height:340px"><canvas id="spChart"></canvas></div>
+  </div>
+  <div class="panel" style="margin-top:20px">
+    <h3 style="font-size:1.1rem;margin-bottom:2px">スポンサー依存度＝スポンサー収入 ÷ 売上高（%）</h3>
+    <p class="lead" style="font-size:.85rem;margin-bottom:10px">高いほど"親会社・スポンサー頼み"、低いほど入場料や物販など収益源が多角化。</p>
+    <div class="chart-box" style="height:560px"><canvas id="depChart"></canvas></div>
+  </div>
+  <div class="ins-grid">
+    <div class="ins"><div class="ic">🟦</div><h3>依存度トップ・町田</h3><p>スポンサー収入40.4億は売上の約7割。サイバーエージェントの強力な支援が急成長を支える一方、収益源の集中はリスクにも。</p></div>
+    <div class="ins"><div class="ic">🧩</div><h3>多角化・神戸/G大阪</h3><p>売上上位でも依存度は3割前後。入場料・物販・配分金など複数の柱で稼ぐ、バランス型の収益構造です。</p></div>
+    <div class="ins"><div class="ic">🏙️</div><h3>母体で変わる色</h3><p>親会社の顔ぶれは多彩：浦和=三菱、神戸=楽天、名古屋=トヨタ、川崎=富士通、町田=サイバーエージェント。母体がクラブの"経営スタイル"を決めます。</p></div>
+  </div>
+  <div class="panel" style="margin-top:20px">
+    <h3 style="font-size:1.1rem;margin-bottom:10px">主要クラブの母体・親会社</h3>
+    <div class="parent-grid" id="parentGrid"></div>
+  </div>
+  <p class="lead" style="font-size:.85rem;margin-top:12px">※配分金・依存度は2024年度決算に基づく。母体は代表的な親会社・主要株主を簡略表記。</p>
+</div></section>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <div id="mTitle" style="font-family:'Baloo 2';font-weight:800;font-size:1.5rem"></div>
+      <div id="mSub" style="color:var(--ink-soft);font-size:.86rem"></div>
+      <button class="close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv" id="mKv"></div>
+      <div id="mStars" style="text-align:center;margin-top:16px;font-family:'Baloo 2';font-weight:800"></div>
+      <div class="chart-box" style="height:250px;margin-top:2px"><canvas id="mRadar"></canvas></div>
+      <div class="chart-box" style="height:260px;margin-top:20px"><canvas id="mChart"></canvas></div>
+      <div id="mHistWrap" style="margin-top:22px">
+        <div style="font-family:'Baloo 2';font-weight:800;font-size:1.05rem;margin-bottom:2px">売上高・人件費の推移（億円）</div>
+        <div id="mHistNote" style="font-size:.78rem;color:var(--ink-soft);margin-bottom:8px"></div>
+        <div class="chart-box" style="height:230px"><canvas id="mHist"></canvas></div>
+      </div>
+      <div id="mTransfer" style="margin-top:20px"></div>
+      <table class="pl-table" id="mPl"></table>
+      <div id="mNotes" style="margin-top:18px"></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <svg width="86" height="86" viewBox="0 0 90 90" style="margin-bottom:6px"><circle cx="45" cy="45" r="30" fill="#FFC948" stroke="#243447" stroke-width="3"/><circle cx="36" cy="42" r="3.5" fill="#243447"/><circle cx="54" cy="42" r="3.5" fill="#243447"/><path d="M36 54q9 8 18 0" fill="none" stroke="#243447" stroke-width="3" stroke-linecap="round"/><text x="45" y="34" font-size="12" text-anchor="middle" fill="#243447" font-family="Baloo 2" font-weight="800">¥</text><circle cx="74" cy="64" r="12" fill="#fff" stroke="#243447" stroke-width="2.5"/><path d="M74 56l4 3-1.5 4.5h-5L70 59z" fill="#243447"/></svg>
+  <div style="font-family:'Baloo 2';font-weight:800;font-size:1.3rem;margin-bottom:8px">Jリーグ・マネー図鑑 ⚽💰</div>
+  <p>数字はすべて公益社団法人 日本プロサッカーリーグ（Jリーグ）が2025年7月に公表した「2024年度クラブ経営情報開示資料」に基づきます。金額はクラブ運営法人単体の決算値です。</p>
+  <p style="margin-top:14px"><span class="tag">DATA SOURCES</span></p>
+  <div class="src-list">
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2024.pdf" target="_blank">2024年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2023.pdf" target="_blank">2023年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2021.pdf" target="_blank">2021年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2020.pdf" target="_blank">2020年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2019.pdf" target="_blank">2019年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/j_kessan-2022.pdf" target="_blank">2022年度 J1クラブ決算一覧（PDF）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/club_doc-2025.pdf" target="_blank">2025年度 クラブ経営情報開示資料（先行発表）</a></p>
+    <p>・<a href="https://www.transfermarkt.us/j1-league/marktwerte/wettbewerb/JAP1" target="_blank">J1 選手市場価値（Transfermarkt・参考）</a></p>
+    <p>・<a href="https://aboutj.jleague.jp/corporate/assets/pdf/club_info/club_doc-2024.pdf" target="_blank">クラブ経営情報開示資料（本発表）</a></p>
+    <p>・<a href="https://www.football-lab.jp/summary/team_ranking/j1/" target="_blank">J1順位表（2023・2024／Football LAB）</a></p>
+    <p>・<a href="https://www.jleague.jp/news/article/24893/" target="_blank">JリーグとDAZNの放映権契約について</a></p>
+  </div>
+  <p style="margin-top:16px;color:#9fb0c0;font-size:.8rem">※本サイトはデータ可視化を目的とした非公式のファンサイトです。投資判断等に用いる場合は必ず一次資料をご確認ください。</p>
+</div></footer>
+
+<!-- PLAYER MODAL -->
+<div class="modal-bg" id="plModalBg">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <div id="plTitle" style="font-family:'Baloo 2';font-weight:800;font-size:1.4rem"></div>
+      <div id="plSub" style="color:var(--ink-soft);font-size:.86rem"></div>
+      <button class="close" onclick="closePl()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:14px;align-items:center">
+        <div id="plAvatar" style="flex-shrink:0"></div>
+        <div id="plInfo" style="flex:1"></div>
+      </div>
+      <div id="plStyle" style="margin-top:12px"></div>
+      <div id="plMv" style="margin-top:14px"></div>
+      <div id="plStats" style="margin-top:8px"></div>
+      <div id="plTst" style="margin-top:2px"></div>
+      <div class="cobiz" id="plNote" style="margin-top:12px"></div>
+      <div id="plExtra" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPANY MODAL -->
+<div class="modal-bg" id="coModalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <div id="coTitle" style="font-family:'Baloo 2';font-weight:800;font-size:1.4rem"></div>
+      <div id="coSub" style="color:var(--ink-soft);font-size:.86rem"></div>
+      <button class="close" onclick="closeCo()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-weight:800;font-size:.9rem;margin-bottom:2px">🏢 事業内容</div>
+      <div class="cobiz" id="coBiz"></div>
+      <div style="font-weight:800;font-size:.9rem;margin:18px 0 6px">📊 企業の規模</div>
+      <div id="coSize"></div>
+      <div style="font-weight:800;font-size:.9rem;margin:18px 0 6px">💰 稼ぎ方（何で儲けている?）</div>
+      <div id="coEarn"></div>
+      <div style="font-weight:800;font-size:.9rem;margin:18px 0 6px">🚦 収益の安定度</div>
+      <div id="coStab"></div>
+      <div style="font-weight:800;font-size:.9rem;margin:18px 0 6px">🔥 本気度（クラブへの投資度）</div>
+      <div id="coHeat"></div>
+      <div style="font-weight:800;font-size:.9rem;margin:18px 0 6px">🔎 分析</div>
+      <div class="cobiz" id="coAnly"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== DATA (百万円) 2024年度 J1クラブ決算一覧 ===== */
+const CLUBS = [
+ {n:"北海道コンサドーレ札幌",s:"札幌",c:"#d20a2e",rev:5000,sponsor:2059,gate:1127,goods:540,dist:362,transfer:657,wage:2176,opProfit:-342,netProfit:-273,assets:2543,liab:2212,equity:331},
+ {n:"鹿島アントラーズ",s:"鹿島",c:"#a4262c",rev:7200,sponsor:2598,gate:1238,goods:720,dist:480,transfer:964,wage:2475,opProfit:76,netProfit:7,assets:5271,liab:3705,equity:1566},
+ {n:"浦和レッズ",s:"浦和",c:"#e50012",rev:10211,sponsor:4108,gate:2012,goods:1594,dist:679,transfer:1192,wage:3186,opProfit:329,netProfit:311,assets:5102,liab:3181,equity:1921},
+ {n:"柏レイソル",s:"柏",c:"#e6c700",rev:4658,sponsor:2845,gate:623,goods:7,dist:285,transfer:658,wage:2121,opProfit:441,netProfit:436,assets:2272,liab:1604,equity:668},
+ {n:"FC東京",s:"FC東京",c:"#002f65",rev:6989,sponsor:2989,gate:1450,goods:768,dist:316,transfer:629,wage:2334,opProfit:96,netProfit:72,assets:3599,liab:1317,equity:2282},
+ {n:"東京ヴェルディ",s:"東京V",c:"#009a4e",rev:3683,sponsor:873,gate:726,goods:346,dist:308,transfer:78,wage:902,opProfit:60,netProfit:34,assets:1147,liab:1096,equity:51},
+ {n:"FC町田ゼルビア",s:"町田",c:"#003f98",rev:5754,sponsor:4043,gate:687,goods:321,dist:320,transfer:81,wage:2478,opProfit:7,netProfit:3,assets:2834,liab:1651,equity:1183},
+ {n:"川崎フロンターレ",s:"川崎F",c:"#009ce5",rev:8403,sponsor:4029,gate:1329,goods:1221,dist:452,transfer:183,wage:2744,opProfit:-713,netProfit:-649,assets:5629,liab:3626,equity:2003},
+ {n:"横浜F・マリノス",s:"横浜FM",c:"#004098",rev:7333,sponsor:2762,gate:1741,goods:1107,dist:489,transfer:18,wage:2366,opProfit:207,netProfit:9,assets:2521,liab:2426,equity:95},
+ {n:"湘南ベルマーレ",s:"湘南",c:"#0a9b4e",rev:2896,sponsor:1310,gate:476,goods:194,dist:289,transfer:339,wage:1245,opProfit:-149,netProfit:-153,assets:1239,liab:1238,equity:1},
+ {n:"アルビレックス新潟",s:"新潟",c:"#ff7e00",rev:4062,sponsor:1338,gate:1010,goods:700,dist:338,transfer:153,wage:970,opProfit:431,netProfit:335,assets:3470,liab:1797,equity:1672},
+ {n:"ジュビロ磐田",s:"磐田",c:"#0aa0dc",rev:4852,sponsor:2849,gate:614,goods:469,dist:308,transfer:196,wage:1948,opProfit:-99,netProfit:-36,assets:1946,liab:1252,equity:693},
+ {n:"名古屋グランパス",s:"名古屋",c:"#e60027",rev:6874,sponsor:2817,gate:1310,goods:824,dist:471,transfer:649,wage:2719,opProfit:49,netProfit:170,assets:2257,liab:1461,equity:795},
+ {n:"京都サンガF.C.",s:"京都",c:"#68207e",rev:3720,sponsor:2151,gate:612,goods:138,dist:292,transfer:206,wage:1680,opProfit:44,netProfit:95,assets:1343,liab:612,equity:731},
+ {n:"ガンバ大阪",s:"G大阪",c:"#00266c",rev:7223,sponsor:2263,gate:1185,goods:758,dist:357,transfer:178,wage:2548,opProfit:221,netProfit:63,assets:2851,liab:2073,equity:778},
+ {n:"セレッソ大阪",s:"C大阪",c:"#e5007e",rev:5401,sponsor:2737,gate:1000,goods:269,dist:319,transfer:493,wage:1825,opProfit:276,netProfit:309,assets:2480,liab:1714,equity:765},
+ {n:"ヴィッセル神戸",s:"神戸",c:"#9b1e2f",rev:8067,sponsor:2439,gate:1309,goods:962,dist:678,transfer:11,wage:2810,opProfit:-148,netProfit:-6,assets:3715,liab:2301,equity:1414},
+ {n:"サンフレッチェ広島",s:"広島",c:"#582e86",rev:8035,sponsor:2719,gate:2004,goods:432,dist:493,transfer:306,wage:2682,opProfit:573,netProfit:473,assets:4477,liab:2670,equity:1807},
+ {n:"アビスパ福岡",s:"福岡",c:"#14285a",rev:3053,sponsor:1025,gate:669,goods:273,dist:374,transfer:177,wage:1424,opProfit:16,netProfit:10,assets:859,liab:1131,equity:-272},
+ {n:"サガン鳥栖",s:"鳥栖",c:"#0a58a8",rev:3058,sponsor:986,gate:607,goods:219,dist:273,transfer:630,wage:1081,opProfit:217,netProfit:187,assets:1263,liab:1235,equity:28}
+];
+/* ===== EXTRA: 順位/移籍費/契約/課題/主力価値 ===== */
+const EXTRA={
+ "札幌":{rank24:19,tc:346,deal:"石屋製菓（白い恋人）などが支える市民クラブ型。特定の親会社を持たない。",issue:"営業赤字で純資産が薄い。2025年はJ2降格し、規模縮小のなかでの再建が課題。",mv:null},
+ "鹿島":{rank24:5,tc:311,deal:"2019年からメルカリが経営権を取得し親会社に。",issue:"移籍収支+6.5億はリーグ随一の売却力。欧州流出のなか戦力維持と黒字定着が課題。",mv:null},
+ "浦和":{rank24:13,tc:784,deal:"三菱自動車・三菱グループが母体。営業収益102億円はJ1最大。",issue:"収入規模は断トツだが人件費も最大。安定黒字と結果の伴うタイトルが課題。",mv:null},
+ "柏":{rank24:17,tc:732,deal:"日立製作所が親会社。日立台（三協F柏）を専用スタジアムに。",issue:"物販・入場料が小さくスポンサー偏重。収益源の多様化とJ1残留が課題。",mv:null},
+ "FC東京":{rank24:7,tc:377,deal:"2021年からミクシィが筆頭株主として経営に参画。",issue:"首都クラブながら売上は中位。入場・スポンサーの一段の拡大が課題。",mv:null},
+ "東京V":{rank24:6,tc:111,deal:"特定親会社を持たずスポンサー連合で運営。2024年にJ1復帰。",issue:"純資産が薄く小規模。J1定着とスポンサー基盤の強化が急務。",mv:null},
+ "町田":{rank24:3,tc:747,deal:"2018年からサイバーエージェントが親会社。潤沢な資金で急成長。",issue:"3年で売上+42.6億の急拡大。移籍費7.5億など投資先行の持続性が課題。",mv:{p:"相馬勇紀",v:4.0}},
+ "川崎F":{rank24:8,tc:1316,deal:"富士通が親会社。等々力の新スタジアム構想が進行中。",issue:"2024年は大型補強と移籍費で営業▲7.1億の赤字。投資と収支の均衡が課題。",mv:null},
+ "横浜FM":{rank24:9,tc:542,deal:"日産自動車＋シティ・フットボール・グループ（CFG）の二頭体制。",issue:"純資産0.95億と自己資本が薄い。安定黒字と財務体質の強化が課題。",mv:null},
+ "湘南":{rank24:15,tc:199,deal:"地域密着型で多数のスポンサーが支える市民クラブ。",issue:"営業赤字が続き純資産はほぼゼロ。小規模ゆえの収益基盤づくりが課題。",mv:null},
+ "新潟":{rank24:16,tc:112,deal:"亀田製菓など地元企業が支える。健全経営で知られる。",issue:"営業利益+4.3億と黒字体質。J1中位から上位へ、規模拡大が次の課題。",mv:null},
+ "磐田":{rank24:18,tc:343,deal:"ヤマハ発動機が親会社。J1・J2を往復するヨーヨークラブ。",issue:"昇降格で収益が不安定。J1定着と人件費の適正化が課題。",mv:null},
+ "名古屋":{rank24:11,tc:368,deal:"トヨタ自動車が親会社。豊田スタジアム／パロマ瑞穂を使用。",issue:"トヨタ依存度が高い。入場料・スポンサーの自立的拡大が課題。",mv:null},
+ "京都":{rank24:14,tc:335,deal:"京セラ・任天堂・ニデック（日本電産）など京都財界が出資。",issue:"市場価値トップ級の選手を擁するが売上は中位。サンガS.の集客最大化が課題。",mv:{p:"ラファエル・エリアス",v:5.8}},
+ "G大阪":{rank24:4,tc:725,deal:"パナソニックが親会社。パナソニックスタジアム吹田を保有。",issue:"売上72億と規模は大きいが成績が低迷。人件費に見合う結果が課題。",mv:null},
+ "C大阪":{rank24:10,tc:727,deal:"ヤンマーが母体。ヨドコウ桜スタジアムを本拠に。",issue:"黒字体質で安定。悲願のリーグタイトルと収益の一段の拡大が課題。",mv:null},
+ "神戸":{rank24:1,tc:465,deal:"楽天（三木谷会長）が親会社。2023・24年にリーグ連覇。",issue:"楽天マネー依存と高人件費。連覇を支える収支の自立化が課題。",mv:{p:"マテウス・トゥーレル",v:3.6}},
+ "広島":{rank24:2,tc:566,deal:"マツダ・エディオン等が支える。2024年にエディオンピースウイング開業。",issue:"新スタで入場料が20億に倍増、営業+5.7億。好調の維持と借入返済が課題。",mv:{p:"川辺駿",v:5.5}},
+ "福岡":{rank24:12,tc:204,deal:"地元企業連合が支える市民クラブ。",issue:"純資産▲2.7億の債務超過。増資・黒字化による早期解消が最大の課題。",mv:null},
+ "鳥栖":{rank24:20,tc:385,deal:"Cygames等がスポンサー。育成と売却で回すモデル。",issue:"移籍収入頼みで純資産は薄い。2025年J2降格で収益減が課題。",mv:null}
+};
+CLUBS.forEach(c=>Object.assign(c,EXTRA[c.s]));
+
+/* ===== 経営力★（バランス型5軸） ===== */
+const REV21={"札幌":3392,"鹿島":6603,"浦和":6891,"柏":3906,"FC東京":4772,"東京V":1755,"町田":1492,"川崎F":6982,"横浜FM":5228,"湘南":2178,"新潟":2208,"磐田":3108,"名古屋":6173,"京都":2209,"G大阪":5179,"C大阪":3738,"神戸":6389,"広島":3460,"福岡":2132,"鳥栖":2267};
+(function(){
+ const wageSorted=[...CLUBS].sort((a,b)=>b.wage-a.wage);
+ CLUBS.forEach(c=>{
+  c._size=c.rev;
+  c._prof=c.netProfit/c.rev;
+  c._health=c.equity/c.assets;
+  c._growth=(c.rev-REV21[c.s])/REV21[c.s];
+  const wr=wageSorted.findIndex(x=>x.s===c.s)+1;
+  c._cospa=wr-c.rank24;            // 人件費順位 - 最終順位（＋ほど費用対効果◎）
+ });
+ const keys=["_size","_prof","_health","_growth","_cospa"];
+ const rng={};
+ keys.forEach(k=>{const vs=CLUBS.map(c=>c[k]);rng[k]=[Math.min(...vs),Math.max(...vs)];});
+ const nz=(v,k)=>{const[a,b]=rng[k];return b===a?50:(v-a)/(b-a)*100;};
+ CLUBS.forEach(c=>{
+  c.axes={
+   size:Math.round(nz(c._size,"_size")),
+   prof:Math.round(nz(c._prof,"_prof")),
+   health:Math.round(nz(c._health,"_health")),
+   growth:Math.round(nz(c._growth,"_growth")),
+   cospa:Math.round(nz(c._cospa,"_cospa"))
+  };
+  const avg=(c.axes.size+c.axes.prof+c.axes.health+c.axes.growth+c.axes.cospa)/5;
+  c.starScore=Math.round((1+4*avg/100)*10)/10;       // 1.0..5.0
+ });
+})();
+function starHTML(v){
+ const full=Math.floor(v+1e-9); const frac=v-full;
+ let out="★".repeat(full);
+ if(frac>=0.25&&frac<0.75) out+="⯨";
+ else if(frac>=0.75){out="★".repeat(full+1);}
+ while(out.replace("⯨","x").length<5) out+="☆";
+ return out.slice(0,5);
+}
+const oku = v => Math.round(v/10)/10;            // 百万円 -> 億円 (1 decimal)
+const fmt = v => (v>=0?"":"−") + oku(Math.abs(v)).toFixed(1);
+Chart.defaults.font.family="'Zen Maru Gothic',sans-serif";
+Chart.defaults.font.size=13;
+Chart.defaults.color="#243447";
+
+/* ===== RANKING CHART ===== */
+const METRICS = {
+ rev:{label:"売上高",color:"#12B36A"}, wage:{label:"トップチーム人件費",color:"#8A6BFF"},
+ gate:{label:"入場料収入",color:"#4C8DFF"}, sponsor:{label:"スポンサー収入",color:"#FF8A3D"},
+ opProfit:{label:"営業利益",color:"#FF5C8A"}, netProfit:{label:"当期純利益",color:"#FFC948"}
+};
+let rankChart;
+function drawRank(metric){
+ const arr=[...CLUBS].sort((a,b)=>b[metric]-a[metric]);
+ const m=METRICS[metric];
+ const colors=arr.map(c=> c[metric]<0 ? "#FF5C8A" : c.c);
+ const data={labels:arr.map(c=>c.s),datasets:[{label:m.label+"（億円）",
+   data:arr.map(c=>oku(c[metric])),backgroundColor:colors,borderColor:"#243447",
+   borderWidth:2,borderRadius:7}]};
+ if(rankChart){rankChart.data=data;rankChart.options.plugins.title.text=m.label+" ランキング（億円）";rankChart.update();return;}
+ rankChart=new Chart(document.getElementById("rankChart"),{type:"bar",data,
+  options:{indexAxis:"y",maintainAspectRatio:false,
+   plugins:{legend:{display:false},title:{display:true,text:m.label+" ランキング（億円）",font:{size:15,weight:"800",family:"'Baloo 2'"}},
+     tooltip:{callbacks:{label:ctx=>" "+ctx.parsed.x.toFixed(1)+" 億円"}}},
+   scales:{x:{grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},y:{grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+}
+const rc=document.getElementById("rankctrl");
+Object.keys(METRICS).forEach((k,i)=>{
+ const b=document.createElement("button");b.className="chip"+(i===0?" active":"");
+ b.textContent=METRICS[k].label;b.onclick=()=>{document.querySelectorAll("#rankctrl .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");drawRank(k);};
+ rc.appendChild(b);
+});
+drawRank("rev");
+
+/* ===== MIX DOUGHNUT (league total) ===== */
+const totals={sponsor:0,gate:0,goods:0,dist:0,transfer:0,other:0};
+CLUBS.forEach(c=>{totals.sponsor+=c.sponsor;totals.gate+=c.gate;totals.goods+=c.goods;
+ totals.dist+=c.dist;totals.transfer+=c.transfer;
+ totals.other+=(c.rev-c.sponsor-c.gate-c.goods-c.dist-c.transfer);});
+new Chart(document.getElementById("mixChart"),{type:"doughnut",
+ data:{labels:["スポンサー収入","入場料収入","物販収入","Jリーグ配分金","移籍補償金等","その他"],
+  datasets:[{data:[totals.sponsor,totals.gate,totals.goods,totals.dist,totals.transfer,totals.other].map(oku),
+   backgroundColor:["#FF8A3D","#4C8DFF","#FFC948","#12B36A","#FF5C8A","#8A6BFF"],borderColor:"#fff",borderWidth:3}]},
+ options:{maintainAspectRatio:false,cutout:"55%",
+  plugins:{legend:{position:"right",labels:{font:{weight:"700"},padding:12,boxWidth:14}},
+   tooltip:{callbacks:{label:ctx=>" "+ctx.label+"：約"+Math.round(ctx.parsed)+"億円"}}}}});
+
+/* ===== SCATTER wage vs rev ===== */
+const maxOp=Math.max(...CLUBS.map(c=>Math.abs(c.opProfit)));
+const revMin=20, revMax=108;   // 億円レンジ（散布図x軸）
+const bubbleSets=CLUBS.map(c=>({label:c.s,type:"bubble",
+   data:[{x:oku(c.rev),y:oku(c.wage),r:8+18*Math.abs(c.opProfit)/maxOp}],
+   backgroundColor:c.opProfit<0?"rgba(255,92,138,.7)":c.c+"cc",borderColor:"#243447",borderWidth:2,order:1}));
+// 人件費比率40%の目安ライン（y = 0.4x）
+const refLine={label:"人件費比率40%ライン",type:"line",order:99,
+   data:[{x:revMin,y:revMin*0.4},{x:revMax,y:revMax*0.4}],
+   borderColor:"#243447",borderWidth:2.5,borderDash:[9,6],
+   pointRadius:0,pointHoverRadius:0,fill:false,tension:0};
+new Chart(document.getElementById("scatChart"),{type:"bubble",
+ data:{datasets:[refLine,...bubbleSets]},
+ options:{maintainAspectRatio:false,
+  plugins:{legend:{display:false},
+   tooltip:{filter:item=>item.dataset.type!=="line",
+    callbacks:{label:ctx=>{const c=CLUBS.find(x=>x.s===ctx.dataset.label);if(!c)return"";
+     return [c.n,"売上 "+oku(c.rev)+"億 / 人件費 "+oku(c.wage)+"億","人件費比率 "+Math.round(c.wage/c.rev*100)+"%","営業利益 "+fmt(c.opProfit)+"億"];}}},
+   annotation:false},
+  scales:{x:{min:revMin,max:revMax,title:{display:true,text:"売上高（億円）→",font:{weight:"700"}},grid:{color:"#EADFC8"}},
+   y:{min:0,title:{display:true,text:"トップチーム人件費（億円）→",font:{weight:"700"}},grid:{color:"#EADFC8"}}}}});
+
+/* ===== SPONSOR TOP10 ===== */
+const sp=[...CLUBS].sort((a,b)=>b.sponsor-a.sponsor).slice(0,10);
+new Chart(document.getElementById("spChart"),{type:"bar",
+ data:{labels:sp.map(c=>c.s),datasets:[{data:sp.map(c=>oku(c.sponsor)),
+   backgroundColor:sp.map(c=>c.c),borderColor:"#243447",borderWidth:2,borderRadius:7}]},
+ options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+   tooltip:{callbacks:{label:ctx=>" "+ctx.parsed.y.toFixed(1)+" 億円"}}},
+  scales:{y:{grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},x:{grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+
+/* ===== CLUB CARDS ===== */
+const grid=document.getElementById("clubGrid");
+function badge(c){
+ if(c.rev===Math.max(...CLUBS.map(x=>x.rev))) return {t:"売上No.1",bg:"#12B36A"};
+ if(c.netProfit===Math.max(...CLUBS.map(x=>x.netProfit))) return {t:"黒字王",bg:"#FF8A3D"};
+ if(c.gate===Math.max(...CLUBS.map(x=>x.gate))) return {t:"集客力",bg:"#4C8DFF"};
+ if(c.wage===Math.max(...CLUBS.map(x=>x.wage))) return {t:"人件費王",bg:"#8A6BFF"};
+ if(c.netProfit===Math.min(...CLUBS.map(x=>x.netProfit))) return {t:"赤字最大",bg:"#FF5C8A"};
+ return null;
+}
+function renderCards(sort){
+ const key = sort==="starScore" ? "starScore" : sort;
+ const arr=[...CLUBS].sort((a,b)=>b[key]-a[key]);
+ grid.innerHTML="";
+ arr.forEach(c=>{
+  const b=badge(c);
+  const el=document.createElement("div");el.className="club-card";
+  const valLine = sort==="starScore"
+    ? `<div class="cv" style="color:#FFB400">${c.starScore.toFixed(1)}<small> 経営力★（5点満点）</small></div>`
+    : `<div class="cv">${fmt(c[sort])}<small> 億円 / ${METRICS[sort]?METRICS[sort].label:"売上高"}</small></div>`;
+  el.innerHTML=`<div class="cbar" style="background:${c.c}"></div>
+    ${b?`<span class="badge-mini" style="background:${b.bg}">${b.t}</span>`:""}
+    <div class="cn">${c.s}</div><div class="cr">${c.n}</div>
+    ${valLine}
+    <div class="card-stars" title="経営力">${starHTML(c.starScore)} <span style="color:var(--ink-soft);font-weight:700">${c.starScore.toFixed(1)}</span></div>`;
+  el.onclick=()=>openModal(c);
+  grid.appendChild(el);
+ });
+}
+document.querySelectorAll("#sortctrl .chip").forEach(b=>{
+ b.onclick=()=>{document.querySelectorAll("#sortctrl .chip").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");renderCards(b.dataset.sort);};
+});
+renderCards("rev");
+
+/* ===== MODAL ===== */
+let mChart;
+function openModal(c){
+ document.getElementById("mTitle").textContent=c.n;
+ document.getElementById("mSub").textContent="2024年度決算（億円）｜"+(c.netProfit>=0?"当期黒字 ✅":"当期赤字 🔻");
+ const ratio=Math.round(c.wage/c.rev*100);
+ document.getElementById("mKv").innerHTML=`
+  <div class="cell"><div class="lab">売上高</div><div class="val">${fmt(c.rev)}<span style="font-size:.7rem"> 億</span></div></div>
+  <div class="cell"><div class="lab">トップチーム人件費</div><div class="val">${fmt(c.wage)}<span style="font-size:.7rem"> 億</span></div></div>
+  <div class="cell"><div class="lab">人件費比率</div><div class="val">${ratio}<span style="font-size:.7rem"> %</span></div></div>
+  <div class="cell"><div class="lab">当期純利益</div><div class="val" style="color:${c.netProfit<0?'#FF5C8A':'#0B8F52'}">${fmt(c.netProfit)}<span style="font-size:.7rem"> 億</span></div></div>
+  <div class="cell"><div class="lab">総資産</div><div class="val">${fmt(c.assets)}<span style="font-size:.7rem"> 億</span></div></div>
+  <div class="cell"><div class="lab">純資産（自己資本）</div><div class="val" style="color:${c.equity<0?'#FF5C8A':'#243447'}">${fmt(c.equity)}<span style="font-size:.7rem"> 億</span></div></div>`;
+ const other=c.rev-c.sponsor-c.gate-c.goods-c.dist-c.transfer;
+ if(mChart)mChart.destroy();
+ mChart=new Chart(document.getElementById("mChart"),{type:"doughnut",
+  data:{labels:["スポンサー","入場料","物販","配分金","移籍等","その他"],
+   datasets:[{data:[c.sponsor,c.gate,c.goods,c.dist,c.transfer,other].map(oku),
+    backgroundColor:["#FF8A3D","#4C8DFF","#FFC948","#12B36A","#FF5C8A","#8A6BFF"],borderColor:"#fff",borderWidth:3}]},
+  options:{maintainAspectRatio:false,cutout:"52%",
+   plugins:{legend:{position:"right",labels:{font:{weight:"700"},padding:8,boxWidth:12}},
+    title:{display:true,text:"収益の内訳（億円）",font:{weight:"800",family:"'Baloo 2'"}},
+    tooltip:{callbacks:{label:ctx=>" "+ctx.label+"："+ctx.parsed.toFixed(1)+"億円"}}}}});
+ document.getElementById("mPl").innerHTML=`
+  <tr><td>営業収益（売上高）</td><td>${fmt(c.rev)} 億</td></tr>
+  <tr><td>　うちスポンサー収入</td><td>${fmt(c.sponsor)} 億</td></tr>
+  <tr><td>　うち入場料収入</td><td>${fmt(c.gate)} 億</td></tr>
+  <tr><td>　うち物販収入</td><td>${fmt(c.goods)} 億</td></tr>
+  <tr><td>　うちJリーグ配分金</td><td>${fmt(c.dist)} 億</td></tr>
+  <tr><td>　うち移籍補償金等収入</td><td>${fmt(c.transfer)} 億</td></tr>
+  <tr><td>トップチーム人件費</td><td>${fmt(c.wage)} 億</td></tr>
+  <tr><td>営業利益</td><td style="color:${c.opProfit<0?'#FF5C8A':'#0B8F52'}">${fmt(c.opProfit)} 億</td></tr>
+  <tr><td>当期純利益</td><td style="color:${c.netProfit<0?'#FF5C8A':'#0B8F52'}">${fmt(c.netProfit)} 億</td></tr>
+  <tr><td>総負債</td><td>${fmt(c.liab)} 億</td></tr>`;
+ drawHist(c);
+ drawExtras(c);
+ document.getElementById("modalBg").classList.add("open");
+}
+let mHist;
+function drawHist(c){
+ const h=HIST[c.s]||{rev:[null,null,null,null,null,null],wage:[null,null,null,null,null],div:["-","-","-","-","-","-"]};
+ const years=["2020","2021","2022","2023","2024","2025"];
+ const revs=h.rev.map(v=>v==null?null:oku(v));
+ const wages=[...h.wage.map(v=>v==null?null:oku(v)),null];
+ const g=(h.rev[4]!=null&&h.rev[0]!=null)?(oku(h.rev[4])-oku(h.rev[0])):null;
+ document.getElementById("mHistNote").textContent=
+   "在籍: "+h.div.map((d,i)=>years[i]+":"+d).join(" / ")
+   +(g!=null?"　｜2020→24で売上 "+(g>=0?"+":"")+g.toFixed(1)+"億":"")
+   +(h.rev[5]!=null?"　（2025速報 "+oku(h.rev[5]).toFixed(1)+"億）":"　（2025は3月/6月決算で未開示）");
+ if(mHist)mHist.destroy();
+ mHist=new Chart(document.getElementById("mHist"),{type:"line",
+  data:{labels:years,datasets:[
+    {label:"売上高",data:revs,borderColor:c.c,backgroundColor:c.c,borderWidth:3,tension:.25,spanGaps:true,pointRadius:4,pointBackgroundColor:"#fff",pointBorderWidth:2},
+    {label:"人件費",data:wages,borderColor:"#8A6BFF",backgroundColor:"#8A6BFF",borderWidth:3,borderDash:[6,4],tension:.25,spanGaps:true,pointRadius:4,pointBackgroundColor:"#fff",pointBorderWidth:2}]},
+  options:{maintainAspectRatio:false,
+   plugins:{legend:{position:"top",labels:{font:{weight:"700"},boxWidth:14,padding:10}},
+    tooltip:{callbacks:{label:ctx=>" "+ctx.dataset.label+"："+(ctx.parsed.y==null?"—":ctx.parsed.y.toFixed(1)+"億")}}},
+   scales:{y:{beginAtZero:true,grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},x:{grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+}
+
+/* ===== HISTORY 6年 rev[2020..2025] wage[2020..2024] div[2020..2025] 百万円 ===== */
+const HIST={
+ "札幌":{rev:[3096,3392,3605,4111,5000,null],wage:[1614,1660,1814,1723,2176],div:["J1","J1","J1","J1","J1","J2"]},
+ "鹿島":{rev:[4797,6603,6116,6462,7200,8173],wage:[2550,2868,2998,2532,2475],div:["J1","J1","J1","J1","J1","J1"]},
+ "浦和":{rev:[5771,6891,8127,10384,10211,11310],wage:[3119,3089,2853,3860,3186],div:["J1","J1","J1","J1","J1","J1"]},
+ "柏":{rev:[4613,3906,4632,4419,4658,null],wage:[2879,3105,3188,2654,2121],div:["J1","J1","J1","J1","J1","J1"]},
+ "FC東京":{rev:[4588,4772,5274,5929,6989,7210],wage:[3034,2712,2538,2597,2334],div:["J1","J1","J1","J1","J1","J1"]},
+ "東京V":{rev:[1493,1755,2116,2818,3683,4510],wage:[660,678,490,778,902],div:["J2","J2","J2","J2","J1","J1"]},
+ "町田":{rev:[1253,1492,1919,3409,5754,6914],wage:[497,655,744,1806,2478],div:["J2","J2","J2","J2","J1","J1"]},
+ "川崎F":{rev:[5445,6982,6979,7963,8403,10069],wage:[3036,3630,3018,3287,2744],div:["J1","J1","J1","J1","J1","J1"]},
+ "横浜FM":{rev:[5864,5228,6481,6509,7333,7751],wage:[2962,2541,3415,3042,2366],div:["J1","J1","J1","J1","J1","J1"]},
+ "湘南":{rev:[2188,2178,2477,2812,2896,null],wage:[1121,1293,1191,1255,1245],div:["J1","J1","J1","J1","J1","J1"]},
+ "新潟":{rev:[2194,2208,2539,3659,4062,4514],wage:[821,691,756,889,970],div:["J2","J2","J2","J1","J1","J1"]},
+ "磐田":{rev:[2867,3108,3232,4254,4852,5668],wage:[1405,1583,1304,1413,1948],div:["J2","J2","J1","J2","J1","J2"]},
+ "名古屋":{rev:[5236,6173,6091,6303,6874,6463],wage:[3525,3089,2817,2836,2719],div:["J1","J1","J1","J1","J1","J1"]},
+ "京都":{rev:[2101,2209,3288,3393,3720,4435],wage:[929,1130,1706,1838,1680],div:["J2","J2","J1","J1","J1","J1"]},
+ "G大阪":{rev:[4491,5179,5969,6574,7223,8817],wage:[2721,2735,2837,2763,2548],div:["J1","J1","J1","J1","J1","J1"]},
+ "C大阪":{rev:[2915,3738,4216,4868,5401,5720],wage:[2020,2449,2043,2010,1825],div:["J1","J1","J1","J1","J1","J1"]},
+ "神戸":{rev:[4714,6389,6365,7037,8067,8711],wage:[6396,5052,4839,3800,2810],div:["J1","J1","J1","J1","J1","J1"]},
+ "広島":{rev:[3209,3460,4017,4198,8035,8348],wage:[2040,1876,2320,2435,2682],div:["J1","J1","J1","J1","J1","J1"]},
+ "福岡":{rev:[1538,2132,2829,2874,3053,3740],wage:[968,1643,1677,1611,1424],div:["J2","J1","J1","J1","J1","J1"]},
+ "鳥栖":{rev:[1649,2267,2761,2497,3058,2729],wage:[1389,1334,1088,1016,1081],div:["J1","J1","J1","J1","J1","J2"]}
+};
+
+/* ===== LEAGUE 5-YEAR TREND ===== */
+const trendYears=["2019","2020","2021","2022","2023","2024","2025*"];
+const trendAvg=[49.5,38.3,41.6,48.6,52.0,58.2,65.1];
+const champs={"2019":"横浜FM","2020":"川崎F","2021":"川崎F","2022":"横浜FM","2023":"神戸","2024":"神戸","2025*":"—(速報)"};
+const troughIdx=1; // 2020
+new Chart(document.getElementById("trendChart"),{type:"line",
+ data:{labels:trendYears,datasets:[{label:"J1 1クラブ平均 営業収益（億円）",data:trendAvg,
+   borderColor:"#12B36A",backgroundColor:"rgba(18,179,106,.12)",borderWidth:4,fill:true,tension:.3,
+   pointRadius:trendYears.map((_,i)=>i===troughIdx?10:7),pointHoverRadius:11,
+   pointBackgroundColor:trendYears.map((_,i)=>i===troughIdx?"#FF5C8A":(i===0?"#243447":"#fff")),
+   pointBorderColor:trendYears.map((_,i)=>i===troughIdx?"#FF5C8A":"#12B36A"),pointBorderWidth:3}]},
+ options:{maintainAspectRatio:false,
+  plugins:{legend:{display:false},
+   title:{display:true,text:"コロナ禍からのV字回復（J1平均営業収益）",font:{size:15,weight:"800",family:"'Baloo 2'"}},
+   tooltip:{callbacks:{label:ctx=>" 平均 "+ctx.parsed.y.toFixed(1)+"億円"+(ctx.dataIndex===0?"（コロナ前ピーク）":ctx.dataIndex===troughIdx?"（コロナ禍の谷底）":""),
+     afterLabel:ctx=>" 👑 王者："+champs[ctx.label]}}},
+  scales:{y:{beginAtZero:true,grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},
+   x:{grid:{display:false},ticks:{font:{weight:"800",size:14}}}}}});
+
+/* ===== MONEY vs RESULT ===== */
+const RES={
+ "2020":[
+  {s:"川崎F",wage:3036,pts:83,rank:1,c:"#009ce5"},{s:"G大阪",wage:2721,pts:65,rank:2,c:"#00266c"},
+  {s:"名古屋",wage:3525,pts:63,rank:3,c:"#e60027"},{s:"C大阪",wage:2020,pts:60,rank:4,c:"#e5007e"},
+  {s:"鹿島",wage:2550,pts:59,rank:5,c:"#a4262c"},{s:"FC東京",wage:3034,pts:57,rank:6,c:"#002f65"},
+  {s:"柏",wage:2879,pts:52,rank:7,c:"#e6c700"},{s:"広島",wage:2040,pts:48,rank:8,c:"#582e86"},
+  {s:"横浜FM",wage:2962,pts:47,rank:9,c:"#004098"},{s:"浦和",wage:3119,pts:46,rank:10,c:"#e50012"},
+  {s:"大分",wage:1154,pts:43,rank:11,c:"#0a3c8e"},{s:"札幌",wage:1614,pts:39,rank:12,c:"#d20a2e"},
+  {s:"鳥栖",wage:1389,pts:36,rank:13,c:"#0a58a8"},{s:"神戸",wage:6396,pts:36,rank:14,c:"#9b1e2f"},
+  {s:"横浜FC",wage:1010,pts:33,rank:15,c:"#12123c"},{s:"清水",wage:1937,pts:28,rank:16,c:"#e97300"},
+  {s:"仙台",wage:1246,pts:28,rank:17,c:"#f0c400"},{s:"湘南",wage:1121,pts:27,rank:18,c:"#0a9b4e"}],
+ "2021":[
+  {s:"川崎F",wage:3630,pts:92,rank:1,c:"#009ce5"},{s:"横浜FM",wage:2541,pts:79,rank:2,c:"#004098"},
+  {s:"神戸",wage:5052,pts:73,rank:3,c:"#9b1e2f"},{s:"鹿島",wage:2868,pts:69,rank:4,c:"#a4262c"},
+  {s:"名古屋",wage:3089,pts:66,rank:5,c:"#e60027"},{s:"浦和",wage:3089,pts:63,rank:6,c:"#e50012"},
+  {s:"鳥栖",wage:1334,pts:59,rank:7,c:"#0a58a8"},{s:"福岡",wage:1643,pts:54,rank:8,c:"#14285a"},
+  {s:"FC東京",wage:2712,pts:53,rank:9,c:"#002f65"},{s:"札幌",wage:1660,pts:51,rank:10,c:"#d20a2e"},
+  {s:"広島",wage:1876,pts:49,rank:11,c:"#582e86"},{s:"C大阪",wage:2449,pts:48,rank:12,c:"#e5007e"},
+  {s:"G大阪",wage:2735,pts:44,rank:13,c:"#00266c"},{s:"清水",wage:2127,pts:42,rank:14,c:"#e97300"},
+  {s:"柏",wage:3105,pts:41,rank:15,c:"#e6c700"},{s:"湘南",wage:1293,pts:37,rank:16,c:"#0a9b4e"},
+  {s:"徳島",wage:1684,pts:36,rank:17,c:"#1560bd"},{s:"大分",wage:1251,pts:35,rank:18,c:"#0a3c8e"},
+  {s:"仙台",wage:1156,pts:28,rank:19,c:"#f0c400"},{s:"横浜FC",wage:1513,pts:27,rank:20,c:"#12123c"}],
+ "2022":[
+  {s:"横浜FM",wage:3415,pts:68,rank:1,c:"#004098"},{s:"川崎F",wage:3018,pts:66,rank:2,c:"#009ce5"},
+  {s:"広島",wage:2320,pts:55,rank:3,c:"#582e86"},{s:"鹿島",wage:2998,pts:52,rank:4,c:"#a4262c"},
+  {s:"C大阪",wage:2043,pts:51,rank:5,c:"#e5007e"},{s:"FC東京",wage:2538,pts:49,rank:6,c:"#002f65"},
+  {s:"柏",wage:3188,pts:47,rank:7,c:"#e6c700"},{s:"名古屋",wage:2817,pts:46,rank:8,c:"#e60027"},
+  {s:"浦和",wage:2853,pts:45,rank:9,c:"#e50012"},{s:"札幌",wage:1814,pts:45,rank:10,c:"#d20a2e"},
+  {s:"鳥栖",wage:1088,pts:42,rank:11,c:"#0a58a8"},{s:"湘南",wage:1191,pts:41,rank:12,c:"#0a9b4e"},
+  {s:"神戸",wage:4839,pts:40,rank:13,c:"#9b1e2f"},{s:"福岡",wage:1677,pts:38,rank:14,c:"#14285a"},
+  {s:"G大阪",wage:2837,pts:37,rank:15,c:"#00266c"},{s:"京都",wage:1706,pts:36,rank:16,c:"#68207e"},
+  {s:"清水",wage:2209,pts:33,rank:17,c:"#e97300"},{s:"磐田",wage:1304,pts:30,rank:18,c:"#0aa0dc"}],
+ "2023":[
+  {s:"神戸",wage:3800,pts:71,rank:1,c:"#9b1e2f"},{s:"横浜FM",wage:3042,pts:64,rank:2,c:"#004098"},
+  {s:"広島",wage:2435,pts:58,rank:3,c:"#582e86"},{s:"浦和",wage:3860,pts:57,rank:4,c:"#e50012"},
+  {s:"鹿島",wage:2532,pts:52,rank:5,c:"#a4262c"},{s:"名古屋",wage:2836,pts:52,rank:6,c:"#e60027"},
+  {s:"福岡",wage:1611,pts:51,rank:7,c:"#14285a"},{s:"川崎F",wage:3287,pts:50,rank:8,c:"#009ce5"},
+  {s:"C大阪",wage:2010,pts:49,rank:9,c:"#e5007e"},{s:"新潟",wage:889,pts:45,rank:10,c:"#ff7e00"},
+  {s:"FC東京",wage:2597,pts:43,rank:11,c:"#002f65"},{s:"札幌",wage:1723,pts:40,rank:12,c:"#d20a2e"},
+  {s:"京都",wage:1838,pts:40,rank:13,c:"#68207e"},{s:"鳥栖",wage:1016,pts:38,rank:14,c:"#0a58a8"},
+  {s:"湘南",wage:1255,pts:34,rank:15,c:"#0a9b4e"},{s:"G大阪",wage:2763,pts:34,rank:16,c:"#00266c"},
+  {s:"柏",wage:2654,pts:33,rank:17,c:"#e6c700"},{s:"横浜FC",wage:2089,pts:29,rank:18,c:"#12123c"}],
+ "2024":[
+  {s:"神戸",wage:2810,pts:72,rank:1,c:"#9b1e2f"},{s:"広島",wage:2682,pts:68,rank:2,c:"#582e86"},
+  {s:"町田",wage:2478,pts:66,rank:3,c:"#003f98"},{s:"G大阪",wage:2548,pts:66,rank:4,c:"#00266c"},
+  {s:"鹿島",wage:2475,pts:65,rank:5,c:"#a4262c"},{s:"東京V",wage:902,pts:56,rank:6,c:"#009a4e"},
+  {s:"FC東京",wage:2334,pts:54,rank:7,c:"#002f65"},{s:"川崎F",wage:2744,pts:52,rank:8,c:"#009ce5"},
+  {s:"横浜FM",wage:2366,pts:52,rank:9,c:"#004098"},{s:"C大阪",wage:1825,pts:52,rank:10,c:"#e5007e"},
+  {s:"名古屋",wage:2719,pts:50,rank:11,c:"#e60027"},{s:"福岡",wage:1424,pts:50,rank:12,c:"#14285a"},
+  {s:"浦和",wage:3186,pts:48,rank:13,c:"#e50012"},{s:"京都",wage:1680,pts:47,rank:14,c:"#68207e"},
+  {s:"湘南",wage:1245,pts:45,rank:15,c:"#0a9b4e"},{s:"新潟",wage:970,pts:42,rank:16,c:"#ff7e00"},
+  {s:"柏",wage:2121,pts:41,rank:17,c:"#e6c700"},{s:"磐田",wage:1948,pts:38,rank:18,c:"#0aa0dc"},
+  {s:"札幌",wage:2176,pts:37,rank:19,c:"#d20a2e"},{s:"鳥栖",wage:1081,pts:35,rank:20,c:"#0a58a8"}]
+};
+function pearson(xs,ys){const n=xs.length,mx=xs.reduce((a,b)=>a+b,0)/n,my=ys.reduce((a,b)=>a+b,0)/n;
+ let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){const dx=xs[i]-mx,dy=ys[i]-my;sxy+=dx*dy;sxx+=dx*dx;syy+=dy*dy;}
+ return sxy/Math.sqrt(sxx*syy);}
+let resultChart;
+function drawResult(year){
+ const arr=RES[year];
+ const byWage=[...arr].sort((a,b)=>b.wage-a.wage);
+ arr.forEach(d=>{d.wr=byWage.findIndex(x=>x.s===d.s)+1; d.gap=d.wr-d.rank;});
+ const r=pearson(arr.map(d=>d.wage),arr.map(d=>d.pts));
+ document.getElementById("corrK").textContent="+"+r.toFixed(2);
+ const top=arr.find(d=>d.wr===1);
+ document.getElementById("corrTop").textContent=top.s+" "+top.rank+"位";
+ const cp=[...arr].sort((a,b)=>b.gap-a.gap)[0];
+ const up=[...arr].sort((a,b)=>a.gap-b.gap)[0];
+ document.getElementById("corrCP").textContent=cp.s+" (人件費"+cp.wr+"位→"+cp.rank+"位)";
+ document.getElementById("corrUP").textContent=up.s+" (人件費"+up.wr+"位→"+up.rank+"位)";
+ const ds=arr.map(d=>({label:d.s,data:[{x:oku(d.wage),y:d.rank}],
+   backgroundColor:d.c,borderColor:"#243447",borderWidth:2,pointRadius:9,pointHoverRadius:12}));
+ const data={datasets:ds};
+ if(resultChart){resultChart.data=data;resultChart.update();return;}
+ resultChart=new Chart(document.getElementById("resultChart"),{type:"scatter",data,
+  options:{maintainAspectRatio:false,
+   plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:ctx=>{const d=RES[document.querySelector("#resultctrl .active").dataset.year].find(x=>x.s===ctx.dataset.label);
+      return [d.s,"人件費 "+oku(d.wage)+"億（人件費"+d.wr+"位）","最終 "+d.rank+"位・勝点"+d.pts];}}}},
+   scales:{x:{title:{display:true,text:"トップチーム人件費（億円）→ 大きいほど高年俸",font:{weight:"700"}},grid:{color:"#EADFC8"}},
+    y:{reverse:true,min:1,title:{display:true,text:"← 最終順位（上ほど上位）",font:{weight:"700"}},
+      grid:{color:"#EADFC8"},ticks:{stepSize:1,callback:v=>v+"位"}}}}});
+}
+document.querySelectorAll("#resultctrl .chip").forEach(b=>{
+ b.onclick=()=>{document.querySelectorAll("#resultctrl .chip").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");drawResult(b.dataset.year);};
+});
+drawResult("2024");
+
+let mRadar;
+function drawExtras(c){
+ document.getElementById("mStars").innerHTML=
+   `<span class="stars">${starHTML(c.starScore)}</span> <span style="font-size:1.3rem">${c.starScore.toFixed(1)}</span><span style="font-size:.8rem;color:var(--ink-soft)"> / 5.0 経営力</span>`;
+ if(mRadar)mRadar.destroy();
+ mRadar=new Chart(document.getElementById("mRadar"),{type:"radar",
+  data:{labels:["規模","収益性","健全性","成長","コスパ"],
+   datasets:[{data:[c.axes.size,c.axes.prof,c.axes.health,c.axes.growth,c.axes.cospa],
+    backgroundColor:c.c+"33",borderColor:c.c,borderWidth:2.5,pointBackgroundColor:c.c,pointRadius:3}]},
+  options:{maintainAspectRatio:false,
+   plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+ctx.label+"："+ctx.parsed.r+"/100"}}},
+   scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:"#EADFC8"},angleLines:{color:"#EADFC8"},
+     pointLabels:{font:{weight:"700",size:12}}}}}});
+ const net=c.transfer-c.tc;
+ document.getElementById("mTransfer").innerHTML=
+   `<div style="font-family:'Baloo 2';font-weight:800;font-size:1.05rem;margin-bottom:6px">移籍収支（2024年度）🔁</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+     <div class="cell" style="flex:1;min-width:120px;background:var(--cream);border:2px solid var(--line);border-radius:12px;padding:10px 12px">
+       <div style="font-size:.72rem;color:var(--ink-soft);font-weight:700">移籍補償金等 収入</div>
+       <div style="font-family:'Baloo 2';font-weight:800;font-size:1.2rem;color:#0B8F52">${fmt(c.transfer)} 億</div></div>
+     <div class="cell" style="flex:1;min-width:120px;background:var(--cream);border:2px solid var(--line);border-radius:12px;padding:10px 12px">
+       <div style="font-size:.72rem;color:var(--ink-soft);font-weight:700">移籍関連 費用</div>
+       <div style="font-family:'Baloo 2';font-weight:800;font-size:1.2rem;color:#FF5C8A">${fmt(c.tc)} 億</div></div>
+     <div class="cell" style="flex:1;min-width:120px;background:var(--cream);border:2.5px solid var(--ink);border-radius:12px;padding:10px 12px">
+       <div style="font-size:.72rem;color:var(--ink-soft);font-weight:700">移籍収支（ネット）</div>
+       <div style="font-family:'Baloo 2';font-weight:800;font-size:1.2rem;color:${net<0?'#FF5C8A':'#0B8F52'}">${net>=0?'+':''}${(Math.round(net/10)/10).toFixed(1)} 億</div></div>
+    </div>`;
+ let notes=`<div class="note-card"><div class="nt">🏢 母体・重要な契約</div><div class="nb">${c.deal}</div></div>
+   <div class="note-card"><div class="nt">⚠️ 経営課題</div><div class="nb">${c.issue}</div></div>`;
+ if(c.mv) notes+=`<div class="note-card"><div class="nt">🌟 主力の市場価値（参考）</div><div class="nb">${c.mv.p}：約 ${c.mv.v} 億円（Transfermarkt推定・2025年時点）</div></div>`;
+ document.getElementById("mNotes").innerHTML=notes;
+}
+
+/* ===== TRANSFER BALANCE CHART ===== */
+(function(){
+ const arr=[...CLUBS].map(c=>({s:c.s,c:c.c,net:c.transfer-c.tc})).sort((a,b)=>b.net-a.net);
+ new Chart(document.getElementById("transferChart"),{type:"bar",
+  data:{labels:arr.map(x=>x.s),datasets:[{data:arr.map(x=>Math.round(x.net/10)/10),
+    backgroundColor:arr.map(x=>x.net<0?"#FF5C8A":"#12B36A"),borderColor:"#243447",borderWidth:2,borderRadius:6}]},
+  options:{indexAxis:"y",maintainAspectRatio:false,
+   plugins:{legend:{display:false},
+    title:{display:true,text:"移籍収支ランキング（億円）＝移籍収入−移籍費用",font:{size:14,weight:"800",family:"'Baloo 2'"}},
+    tooltip:{callbacks:{label:ctx=>(ctx.parsed.x>=0?" +":" ")+ctx.parsed.x.toFixed(1)+" 億円"}}},
+   scales:{x:{grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},y:{grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+})();
+
+/* ===== DISTRIBUTION (stacked) & SPONSOR DEPENDENCY ===== */
+(function(){
+ const base=2.5;
+ const arr=[...CLUBS].sort((a,b)=>b.dist-a.dist);
+ new Chart(document.getElementById("distChart"),{type:"bar",
+  data:{labels:arr.map(c=>c.s),datasets:[
+   {label:"均等配分金（2.5億）",data:arr.map(c=>Math.min(oku(c.dist),base)),backgroundColor:"#0B8F52",borderColor:"#243447",borderWidth:2,stack:"d"},
+   {label:"理念強化など上乗せ",data:arr.map(c=>Math.max(0,oku(c.dist)-base)),backgroundColor:"#FFC948",borderColor:"#243447",borderWidth:2,stack:"d"}]},
+  options:{indexAxis:"y",maintainAspectRatio:false,
+   plugins:{legend:{position:"top",labels:{font:{weight:"700"},boxWidth:14}},
+    tooltip:{callbacks:{label:ctx=>" "+ctx.dataset.label+"："+ctx.parsed.x.toFixed(1)+"億",
+      footer:items=>{const c=arr.find(x=>x.s===items[0].label);return "合計 "+oku(c.dist).toFixed(1)+"億";}}}},
+   scales:{x:{stacked:true,grid:{color:"#EADFC8"},ticks:{callback:v=>v+"億"}},y:{stacked:true,grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+
+ const dep=[...CLUBS].map(c=>({s:c.s,c:c.c,v:Math.round(c.sponsor/c.rev*1000)/10})).sort((a,b)=>b.v-a.v);
+ new Chart(document.getElementById("depChart"),{type:"bar",
+  data:{labels:dep.map(x=>x.s),datasets:[{data:dep.map(x=>x.v),
+    backgroundColor:dep.map(x=>x.c),borderColor:"#243447",borderWidth:2,borderRadius:6}]},
+  options:{indexAxis:"y",maintainAspectRatio:false,
+   plugins:{legend:{display:false},
+    title:{display:true,text:"スポンサー依存度（%）",font:{size:14,weight:"800",family:"'Baloo 2'"}},
+    tooltip:{callbacks:{label:ctx=>" "+ctx.parsed.x.toFixed(1)+"%"}}},
+   scales:{x:{grid:{color:"#EADFC8"},ticks:{callback:v=>v+"%"}},y:{grid:{display:false},ticks:{font:{weight:"700"}}}}}});
+})();
+
+/* ===== PARENT COMPANIES ===== */
+const PARENTS=[
+ {cl:"浦和",p:"三菱自動車",term:"24/3",rev:27895,net:1547},
+ {cl:"鹿島",p:"メルカリ",term:"24/6",rev:1874,net:135},
+ {cl:"柏",p:"日立製作所",term:"24/3",rev:85646,net:5898},
+ {cl:"FC東京",p:"MIXI",term:"24/3",rev:1469,net:71},
+ {cl:"町田",p:"サイバーエージェント",term:"24/9",rev:8030,net:162},
+ {cl:"川崎F",p:"富士通",term:"24/3",rev:37560,net:2545},
+ {cl:"横浜FM",p:"日産自動車",term:"24/3",rev:126857,net:4266},
+ {cl:"名古屋",p:"トヨタ自動車",term:"24/3",rev:450953,net:49449},
+ {cl:"G大阪",p:"パナソニックHD",term:"24/3",rev:84964,net:4440},
+ {cl:"神戸",p:"楽天グループ",term:"24/12",rev:22792,net:-1624},
+ {cl:"広島",p:"マツダ",term:"24/3",rev:48277,net:2077},
+ {cl:"磐田",p:"ヤマハ発動機",term:"23/12",rev:24148,net:1641},
+ {cl:"京都",p:"京セラ",term:"24/3",rev:20042,net:1010}
+];
+const CLUB2CO={"浦和":"mitsubishi","鹿島":"mercari","柏":"hitachi","FC東京":"mixi","町田":"cyberagent","川崎F":"fujitsu","横浜FM":"nissan","名古屋":"toyota","G大阪":"panasonic","神戸":"rakuten","広島":"mazda","磐田":"yamaha","京都":"kyocera"};
+const bigYen=v=>{const a=Math.abs(v);const str=a>=10000?(a/10000).toFixed(1)+"兆":a.toLocaleString()+"億";return (v<0?"▲":"")+str;};
+PARENTS.forEach(p=>{const c=CLUBS.find(x=>x.s===p.cl);p.sp=oku(c.sponsor);p.col=c.c;
+ p.heat=p.net>0?Math.round(p.sp/p.net*1000)/10:null;});
+function flameN(h){return h>=20?5:h>=10?4:h>=2.5?3:h>=1?2:1;}
+function flamesHTML(n,sz){sz=sz||1.3;let o="";for(let i=0;i<5;i++)o+=`<span style="opacity:${i<n?1:.16};font-size:${sz}rem">🔥</span>`;return o;}
+(function(){
+ const arr=[...PARENTS].sort((a,b)=>(b.heat==null?-1:b.heat)-(a.heat==null?-1:a.heat));
+ const g=document.getElementById("flameGrid"); if(!g)return; g.innerHTML="";
+ arr.forEach(p=>{
+  const key=CLUB2CO[p.cl];
+  const el=document.createElement("div"); el.className="flamecard"; el.onclick=()=>openCompany(key);
+  if(p.heat==null){
+   el.innerHTML=`<div class="cbar" style="background:${p.col}"></div>
+     <div class="fc-club">${p.cl} <span>／ ${p.p}</span></div>
+     <div class="fc-flames" style="font-size:1.3rem">❤️❤️❤️</div>
+     <div class="fc-num" style="color:var(--pink)">別格<small> 赤字でも支援</small></div>`;
+  }else{
+   const n=flameN(p.heat);
+   el.innerHTML=`<div class="cbar" style="background:${p.col}"></div>
+     <div class="fc-club">${p.cl} <span>／ ${p.p}</span></div>
+     <div class="fc-flames">${flamesHTML(n)}</div>
+     <div class="fc-num">${p.heat.toFixed(1)}%<small> 純利益比</small></div>`;
+  }
+  g.appendChild(el);
+ });
+})();
+
+/* ===== COMPANIES (母体) ===== */
+const COMPANIES={
+ "mitsubishi":{name:"三菱自動車（三菱グループ）",club:"浦和",listed:"上場",term:"2024年3月期",fin:{rev:27895,op:1909,net:1547},
+   biz:"自動車メーカー。SUVやPHEV（プラグインハイブリッド）、東南アジア市場に強み。浦和は三菱自動車を中心に三菱グループ各社が支える。",
+   anly:"売上・営業利益とも過去最高で堅調。純利益1,547億に対し浦和へ約41億は自動車大手のなかでは相対的に手厚く、伝統的な結び付きの強さがうかがえる。"},
+ "rakuten":{name:"楽天グループ",club:"神戸",listed:"上場",term:"2024年12月期",fin:{rev:22792,op:530,net:-1624},
+   biz:"インターネットサービス大手。EC『楽天市場』、金融、携帯電話事業を展開。モバイルの先行投資で純損益は赤字が続くが、売上高は過去最高を更新中。",
+   anly:"売上は過去最高だがモバイル投資で純損失が継続。赤字下でも神戸への投資を続ける“戦略投資”型で、勝利とブランド価値づくりを優先している。"},
+ "cyberagent":{name:"サイバーエージェント",club:"町田",listed:"上場",term:"2024年9月期",fin:{rev:8030,op:418,net:162},
+   biz:"インターネット広告の国内最大手級。動画配信『ABEMA』、ゲーム子会社Cygamesを擁する。2018年からFC町田ゼルビアを子会社化し急成長を後押し。",
+   anly:"ネット広告・ABEMA・ゲームの3本柱。純利益の約25%に相当する額を町田へ投じ、急成長を資金面で全面支援する“専業オーナー”の典型例。"},
+ "fujitsu":{name:"富士通",club:"川崎F",listed:"上場",term:"2024年3月期",fin:{rev:37560,op:1602,net:2545},
+   biz:"総合ICT大手。企業向けシステム構築・ITサービスが中核で、DX事業ブランド『Uvance』を推進。川崎フロンターレの親会社。",
+   anly:"国内ITサービスは堅調だが営業益は減益局面。純利益2,545億に対し川崎へ約40億（1.6%）で、長年にわたる安定支援が特徴。"},
+ "toyota":{name:"トヨタ自動車",club:"名古屋",listed:"上場",term:"2024年3月期",fin:{rev:450953,op:53529,net:49449},
+   biz:"世界販売台数トップ級の自動車メーカー。日本企業として初めて営業利益5兆円を突破。名古屋グランパスの親会社。",
+   anly:"日本企業初の営業利益5兆円。桁違いの規模ゆえ名古屋への支援は純利益の0.06%＝ほぼ誤差。財務より地域・ブランドへの投資という位置づけ。"},
+ "panasonic":{name:"パナソニック ホールディングス",club:"G大阪",listed:"上場",term:"2024年3月期",fin:{rev:84964,op:3610,net:4440},
+   biz:"総合電機大手。家電・車載電池・住宅・B2Bソリューションを展開。ガンバ大阪の親会社で、パナソニックスタジアム吹田を保有する。",
+   anly:"家電から車載電池・B2Bへ構造転換中。純利益4,440億に対しG大阪へ約23億（0.5%）。スタジアム保有など地域密着の姿勢も強い。"},
+ "yanmar":{name:"ヤンマーホールディングス",club:"C大阪",listed:"非上場",term:null,fin:null,
+   biz:"農業機械・産業用ディーゼルエンジンの大手。建設機械やマリン事業も手がける非上場企業。セレッソ大阪の母体。",
+   anly:"農機・エンジンで世界的地位を持つ非上場企業。財務は非公開だが、セレッソを長年安定して支える存在。"},
+ "hitachi":{name:"日立製作所",club:"柏",listed:"上場",term:"2024年3月期",fin:{rev:85646,op:7558,net:5898},
+   biz:"総合電機・社会インフラ大手。デジタル基盤『Lumada』を軸に、エネルギー・鉄道・ITへ注力。柏レイソルの親会社（日立台が本拠）。",
+   anly:"Lumadaを軸に高収益体質へ転換中（営業利益は調整後）。売上8.6兆の巨大企業にとって柏への支援は純利益の0.5%と、財務的には小さい。"},
+ "mixi":{name:"MIXI（ミクシィ）",club:"FC東京",listed:"上場",term:"2024年3月期",fin:{rev:1469,op:192,net:71},
+   biz:"ゲーム『モンスターストライク』やSNS、スポーツ事業を展開。プロバスケ・千葉ジェッツも傘下。2021年からFC東京の筆頭株主。",
+   anly:"モンスト依存からスポーツ・多角化へ。純利益71億に対しFC東京へ約30億（約42%）は本サイト最高水準の“本気度”で、スポーツ事業を重視する姿勢が鮮明。"},
+ "mercari":{name:"メルカリ",club:"鹿島",listed:"上場",term:"2024年6月期",fin:{rev:1874,op:175,net:135},
+   biz:"フリマアプリ『メルカリ』を運営。国内EC、フィンテック『メルペイ』を展開。2019年から鹿島アントラーズの経営権を取得。",
+   anly:"国内フリマとメルペイが収益源。純利益135億に対し鹿島へ約26億（約19%）は新興企業として大きな賭けで、伝統ある名門の再建に挑む。"},
+ "nissan":{name:"日産自動車",club:"横浜FM",listed:"上場",term:"2024年3月期",fin:{rev:126857,op:5687,net:4266},
+   biz:"自動車メーカー。EV『リーフ』などを展開するが近年は業績が悪化（翌2025年3月期に大幅な純損失）。横浜FMはシティ・フットボール・グループ（CFG）とも提携。",
+   anly:"この期は営業利益5,687億と好調も、翌2025年3月期に約6,700億円の純損失へ急転。横浜FMはCFGとの提携で経営ノウハウを補完している。"},
+ "mazda":{name:"マツダ",club:"広島",listed:"上場",term:"2024年3月期",fin:{rev:48277,op:2505,net:2077},
+   biz:"自動車メーカー。低燃費技術『SKYACTIV』やデザイン、ロータリーエンジンに強み。広島が本拠地で、サンフレッチェを支える。",
+   anly:"SKYACTIVと円安効果で最高益。純利益2,077億に対し広島へ約27億（1.3%）。本拠・広島との一体感が支援の背景にある。"},
+ "yamaha":{name:"ヤマハ発動機",club:"磐田",listed:"上場",term:"2023年12月期",fin:{rev:24148,op:2507,net:1641},
+   biz:"二輪車・マリン（船外機）・ロボティクス・産業用機械を展開。3期連続で最高益圏。静岡・磐田を本拠にジュビロの親会社。",
+   anly:"二輪・マリンで3期連続の高収益。純利益1,641億に対し磐田へ約28億（1.7%）。地元・静岡の柱として昇降格を繰り返すクラブを支える。"},
+ "kyocera":{name:"京セラ（ほか任天堂・ニデック等）",club:"京都",listed:"上場",term:"2024年3月期",fin:{rev:20042,op:929,net:1010},
+   biz:"電子部品・ファインセラミックスの大手。京都サンガは京セラのほか、任天堂・ニデック（旧日本電産）など京都財界が出資して支える。",
+   anly:"電子部品が半導体市況で減益。純利益1,010億に対し京都へ約22億（2.1%）。任天堂・ニデック等と京都財界が共同で支える珍しい体制。"},
+ "kameda":{name:"亀田製菓 ほか地元企業",club:"新潟",listed:"上場",term:null,fin:null,
+   biz:"米菓最大手（ハッピーターン、亀田の柿の種など）。新潟が本拠の上場企業で、アルビレックス新潟を地元企業とともに支える。",
+   anly:"米菓最大手。新潟の地元企業として、複数社とともに健全経営で知られるアルビレックスを支える。"},
+ "ishiya":{name:"石屋製菓",club:"札幌",listed:"非上場",term:null,fin:null,
+   biz:"銘菓『白い恋人』で知られる北海道の菓子メーカー（非上場）。北海道コンサドーレ札幌を支える市民クラブ型の主要スポンサー。",
+   anly:"『白い恋人』の菓子メーカー。北海道を象徴する企業として、市民クラブ型の札幌を長く支援している。"},
+ "cygames":{name:"Cygames ほか",club:"鳥栖",listed:"非上場",term:null,fin:null,
+   biz:"スマホゲーム大手（『ウマ娘』『グランブルーファンタジー』等）。サイバーエージェント傘下で、サガン鳥栖の主要スポンサー。",
+   anly:"CA傘下のゲーム大手。ヒット作の収益力を背景に、育成・売却型経営の鳥栖の主要スポンサーを担う。"},
+ "citizenTV":{name:"スポンサー連合（市民クラブ型）",club:"東京V",listed:"—",term:null,fin:null,
+   biz:"特定の親会社を持たず、複数のスポンサー企業の連合で運営する市民クラブ型。2024年にJ1へ復帰した。",
+   anly:"特定の親会社を持たず、多くの地元・スポンサー企業が少しずつ支える市民クラブ型。地域との結び付きが経営の生命線。"},
+ "citizenSH":{name:"市民クラブ型（地元企業連合）",club:"湘南",listed:"—",term:null,fin:null,
+   biz:"地域密着の市民クラブ型。特定の親会社を持たず、多数の地元企業がスポンサーとして支える。",
+   anly:"特定の親会社を持たない市民クラブ型。多数の地元企業の支援で成り立ち、身の丈に合った堅実経営が求められる。"},
+ "citizenFU":{name:"市民クラブ型（地元企業連合）",club:"福岡",listed:"—",term:null,fin:null,
+   biz:"市民クラブ型。地元・福岡の企業連合が支える。純資産のプラス化（債務超過の解消）が経営課題。",
+   anly:"地元企業連合が支える市民クラブ型。純資産のプラス化（債務超過の解消）が当面の経営課題となっている。"}
+};
+const COMETA={
+ mitsubishi:{kind:"自動車メーカー（三菱グループ）",howEarn:"クルマ（SUV・PHEV）の販売。東南アジア市場が主力。",stab:{lv:"安定",note:"近年は好調で過去最高益。ただし自動車市況の波は受けやすい。"}},
+ rakuten:{kind:"国内有数のネットサービス大手",howEarn:"EC『楽天市場』、金融、携帯電話事業。",stab:{lv:"赤字",note:"売上は成長も、携帯電話事業への大型投資で純損失が続く。"}},
+ cyberagent:{kind:"ネット広告・メディアの大手",howEarn:"ネット広告、動画『ABEMA』、ゲーム（Cygames）。",stab:{lv:"変動",note:"広告は堅調だが、ゲームのヒット次第で利益が上下しやすい。"}},
+ fujitsu:{kind:"国内最大手級のIT企業",howEarn:"企業向けITサービス・システム構築（Uvance）。",stab:{lv:"安定",note:"ITサービスで安定的に黒字。年ごとの増減はある。"}},
+ toyota:{kind:"世界トップ級の自動車メーカー",howEarn:"クルマの販売（世界販売台数トップ級）。",stab:{lv:"安定",note:"毎年安定して高収益。最高益を更新し続けている。"}},
+ panasonic:{kind:"総合電機大手",howEarn:"家電、車載電池、住宅、B2Bソリューション。",stab:{lv:"安定",note:"おおむね安定して黒字。直近は一時的要因も加わり最高益。"}},
+ yanmar:{kind:"農機・エンジンの世界的メーカー（非上場）",howEarn:"農業機械、産業用エンジン、建機・マリン。",stab:{lv:"非公開",note:"非上場のため利益は非公開。世界的な事業基盤を持つ。"}},
+ hitachi:{kind:"総合電機・社会インフラの巨人",howEarn:"社会インフラ・IT（デジタル基盤『Lumada』）。",stab:{lv:"安定",note:"構造改革で高収益体質に転換し、安定して黒字。"}},
+ mixi:{kind:"ゲーム・スポーツの成長企業",howEarn:"ゲーム『モンスト』、SNS、スポーツ事業。",stab:{lv:"変動",note:"主力『モンスト』の人気に業績が左右されやすい。"}},
+ mercari:{kind:"国内最大のフリマ企業",howEarn:"フリマアプリ『メルカリ』、フィンテック『メルペイ』。",stab:{lv:"安定",note:"黒字を確保しながら成長。国内事業は安定している。"}},
+ nissan:{kind:"大手自動車メーカー",howEarn:"クルマの販売（EV『リーフ』などグローバル展開）。",stab:{lv:"変動",note:"業績の波が大きく、翌2025年3月期には大幅赤字へ転落。"}},
+ mazda:{kind:"自動車メーカー（広島が本拠）",howEarn:"クルマの販売（低燃費技術SKYACTIV）。",stab:{lv:"変動",note:"為替や北米市況の影響を受けやすいが、直近は最高益。"}},
+ yamaha:{kind:"二輪・マリンの世界的メーカー",howEarn:"二輪車、船外機（マリン）、ロボティクス。",stab:{lv:"安定",note:"二輪・マリンで3期連続の高収益。稼ぐ力が安定している。"}},
+ kyocera:{kind:"電子部品の大手",howEarn:"電子部品・ファインセラミックス。",stab:{lv:"変動",note:"半導体・電子部品の市況で利益が上下しやすい。"}},
+ kameda:{kind:"米菓の最大手",howEarn:"米菓（ハッピーターン、亀田の柿の種など）。",stab:{lv:"非公開",note:"本サイトでは通期数値は未収録。安定した米菓需要が基盤。"}},
+ ishiya:{kind:"北海道の有名菓子メーカー（非上場）",howEarn:"菓子（『白い恋人』など）。",stab:{lv:"非公開",note:"非上場のため利益は非公開。北海道を象徴する企業。"}},
+ cygames:{kind:"人気スマホゲーム企業",howEarn:"スマホゲーム（『ウマ娘』『グラブル』など）。",stab:{lv:"非公開",note:"非上場のため利益は非公開。ヒット作の収益力が背景。"}},
+ citizenTV:{kind:"市民クラブ（スポンサー連合）",howEarn:"多数の地元・スポンサー企業の協賛。",stab:{lv:"—",note:"特定の親会社を持たない市民クラブ型。"}},
+ citizenSH:{kind:"市民クラブ（地元企業連合）",howEarn:"多数の地元企業の協賛。",stab:{lv:"—",note:"特定の親会社を持たない市民クラブ型。"}},
+ citizenFU:{kind:"市民クラブ（地元企業連合）",howEarn:"地元・福岡の企業連合の協賛。",stab:{lv:"—",note:"特定の親会社を持たない市民クラブ型。"}}
+};
+Object.keys(COMETA).forEach(k=>{if(COMPANIES[k])Object.assign(COMPANIES[k],COMETA[k]);});
+const GRID=[
+ ["浦和","三菱グループ","mitsubishi"],["神戸","楽天","rakuten"],["町田","サイバーエージェント","cyberagent"],["川崎F","富士通","fujitsu"],
+ ["名古屋","トヨタ自動車","toyota"],["G大阪","パナソニック","panasonic"],["C大阪","ヤンマー","yanmar"],["柏","日立製作所","hitachi"],
+ ["FC東京","ミクシィ","mixi"],["鹿島","メルカリ","mercari"],["横浜FM","日産／CFG","nissan"],["広島","マツダ","mazda"],
+ ["磐田","ヤマハ発動機","yamaha"],["京都","京セラ 等","kyocera"],["新潟","亀田製菓 等","kameda"],["札幌","石屋製菓","ishiya"],
+ ["鳥栖","Cygames 等","cygames"],["東京V","スポンサー連合","citizenTV"],["湘南","市民クラブ型","citizenSH"],["福岡","市民クラブ型","citizenFU"]
+];
+(function(){
+ const g=document.getElementById("parentGrid"); if(!g)return; g.innerHTML="";
+ GRID.forEach(([cl,label,co])=>{
+  const el=document.createElement("div"); el.className="pcell";
+  el.innerHTML=`<b>${cl}</b> ${label}<span class="arw">›</span>`;
+  el.onclick=()=>openCompany(co);
+  g.appendChild(el);
+ });
+})();
+function openCompany(key){
+ const co=COMPANIES[key]; if(!co)return;
+ const c=CLUBS.find(x=>x.s===co.club);
+ const spOku=c?oku(c.sponsor):null;
+ document.getElementById("coTitle").textContent=co.name;
+ document.getElementById("coSub").textContent=(co.club?co.club+" の母体・主要株主":"")+"　｜　"+co.listed+(co.term?"・"+co.term:"");
+ document.getElementById("coBiz").textContent=co.biz;
+ // 企業の規模（絶対）
+ const tf=r=>r>=100000?{l:"超巨大企業",e:"🏙️"}:r>=30000?{l:"巨大企業",e:"🏙️"}:r>=10000?{l:"大企業",e:"🏢"}:r>=3000?{l:"大手企業",e:"🏬"}:{l:"中堅・成長企業",e:"🌱"};
+ let sz;
+ if(co.fin){const t=tf(co.fin.rev);
+  sz=`<div class="cosize"><div class="cs-emoji">${t.e}</div><div><div class="tier">${t.l}</div><div class="rev">売上高 ${bigYen(co.fin.rev)}</div><div class="kind">${co.kind||""}</div></div></div>`;
+ }else{
+  sz=`<div class="cosize"><div class="cs-emoji">${co.listed==="非上場"?"🏭":"🤝"}</div><div><div class="tier">${co.kind||""}</div><div class="kind">${co.listed==="非上場"?"非上場のため売上規模は非公開":"特定の母体を持たない市民クラブ型"}</div></div></div>`;
+ }
+ document.getElementById("coSize").innerHTML=sz;
+ // 稼ぎ方
+ document.getElementById("coEarn").innerHTML=`<div class="coearn"><span class="h">💰 ${co.howEarn||""}</span></div>`;
+ // 収益の安定度
+ const sm={"安定":{e:"🟢",bg:"#E6F7EE",t:"安定して黒字"},"変動":{e:"🟡",bg:"#FFF7E2",t:"利益が変動しやすい"},"赤字":{e:"🔴",bg:"#FFEAF0",t:"現在は赤字（投資先行）"}};
+ const m=sm[co.stab&&co.stab.lv]||{e:"⚪",bg:"#F1EEE6",t:"非公開・対象外"};
+ let prof="";
+ if(co.fin){prof = co.fin.net>=0?`　／　直近の純利益 <b>${bigYen(co.fin.net)}</b>`:`　／　直近は <b style="color:#FF5C8A">純損失 ${bigYen(co.fin.net)}</b>`;}
+ document.getElementById("coStab").innerHTML=`<div class="costab" style="background:${m.bg}"><div class="lv">${m.e} ${m.t}</div><div class="note">${(co.stab&&co.stab.note)||""}${prof}</div></div>`;
+ // 本気度
+ let hh="";
+ if(c){
+  if(co.fin&&co.fin.net>0){const h=spOku/co.fin.net*100,n=flameN(h);
+   hh=`<div class="coheat"><div style="line-height:1">${flamesHTML(n,1.8)}</div><div style="font-family:'Baloo 2';font-weight:800;font-size:1.7rem;color:#FF8A3D;margin-top:6px">${h.toFixed(1)}<span style="font-size:.9rem">%</span></div><div style="font-size:.82rem;color:var(--ink-soft);margin-top:4px">母体の純利益 <b>${bigYen(co.fin.net)}</b> のうち、${co.club}へのスポンサー <b>${spOku.toFixed(1)}億円</b> は約 ${h.toFixed(1)}%。🔥が多いほど“本気”。</div></div>`;
+  }else if(co.fin&&co.fin.net<=0){
+   hh=`<div class="coheat"><div style="font-size:1.7rem;line-height:1">❤️❤️❤️</div><div style="font-family:'Baloo 2';font-weight:800;font-size:1.25rem;color:var(--pink);margin-top:6px">別格（赤字でも支援）</div><div style="font-size:.82rem;color:var(--ink-soft);margin-top:4px">母体は当期赤字。それでも${co.club}へ <b>${spOku.toFixed(1)}億円</b> を投じ、支援を継続。</div></div>`;
+  }else{
+   const msg=co.listed==="—"?`市民クラブ型のため本気度指標の対象外。${co.club}のスポンサー収入は <b>${spOku.toFixed(1)}億円</b>（2024年度）。`:`母体は非上場のため純利益が非公開。${co.club}へのスポンサーは <b>${spOku.toFixed(1)}億円</b>（2024年度）。`;
+   hh=`<div class="coheat" style="text-align:left"><div style="font-size:.88rem;color:var(--ink-soft)">${msg}</div></div>`;
+  }
+ }else hh=`<div class="coheat" style="text-align:left"><div style="font-size:.88rem;color:var(--ink-soft)">特定の親会社を持たない市民クラブ型のため対象外。</div></div>`;
+ document.getElementById("coHeat").innerHTML=hh;
+ document.getElementById("coAnly").textContent=co.anly||"";
+ document.getElementById("coModalBg").classList.add("open");
+}
+function closeCo(){document.getElementById("coModalBg").classList.remove("open");}
+document.getElementById("coModalBg").onclick=e=>{if(e.target.id==="coModalBg")closeCo();};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCo();});
+
+/* ===== 2026/27 確定移籍ボード ===== */
+const T26_ORDER=["鹿島","浦和","柏","FC東京","東京V","町田","川崎F","横浜FM","清水","名古屋","京都","G大阪","C大阪","神戸","岡山","広島","福岡","長崎","千葉","水戸"];
+const T26_COL={"鹿島":"#a4262c","浦和":"#e50012","柏":"#e6c700","FC東京":"#002f65","東京V":"#009a4e","町田":"#003f98","川崎F":"#009ce5","横浜FM":"#004098","清水":"#e97300","名古屋":"#e60027","京都":"#68207e","G大阪":"#00266c","C大阪":"#e5007e","神戸":"#9b1e2f","岡山":"#c8102e","広島":"#582e86","福岡":"#14285a","長崎":"#005bac","千葉":"#d7b100","水戸":"#1a2f6b"};
+const T26={
+ "鹿島":{i:[["MF","マテウス・ブエノ","清水","完"]],o:[["MF","知念 慶","横浜FM","完"],["FW","師岡 柊生","福岡","完"]]},
+ "浦和":{i:[["FW","南野 遥海","G大阪","完"],["DF","林 幸多郎","町田","完"],["GK","福井 光輝","C大阪","完"],["MF","水沼 宏太","豪州","完"]],o:[["MF","松尾 佑介","町田","完"],["MF","関根 貴大","シドニー","完"],["DF","石原 広教","FC東京","完"],["MF","中島 翔哉","契約満了","満"],["FW","安部 裕葵","契約満了","満"]]},
+ "柏":{i:[["MF","遠藤 渓太","FC東京","完"],["DF","麻田 将吾","京都","完"],["MF","満田 誠","G大阪","期"],["MF","弓場 堅真","鳥栖","完"]],o:[["FW","山本 桜大","ライプツィヒ","完"],["FW","小見 洋太","C大阪","期"]]},
+ "FC東京":{i:[["FW","本間 至恩","浦和","完"],["DF","石原 広教","浦和","完"],["DF","稲村 隼翔","セルティック","完"]],o:[["MF","佐藤 龍之介","バレンシア","完"],["MF","遠藤 渓太","柏","完"],["MF","小泉 慶","清水","完"],["MF","東 慶悟","契約満了","満"]]},
+ "東京V":{i:[["FW","キム・ヒョンウ","大分","完"],["MF","神田 奏真","川崎F","期"]],o:[["DF","深澤 大輝","福岡","完"]]},
+ "町田":{i:[["MF","明本 考浩","OHルーヴェン","完"],["FW","M.デューク","豪州","完"],["MF","松尾 佑介","浦和","完"]],o:[["FW","ナ・サンホ","岡山","完"],["DF","林 幸多郎","浦和","完"],["FW","オ・セフン","清水","完"]]},
+ "川崎F":{i:[["DF","ペドロ・ホマーノ","ブラジル","完"],["FW","カイキ","ブラジル","期"]],o:[["FW","エリソン","千葉","完"],["MF","神田 奏真","東京V","期"]]},
+ "横浜FM":{i:[["GK","ルベン・ブランコ","スペイン","完"],["FW","二田 理央","浦和","完"],["MF","知念 慶","鹿島","完"]],o:[["MF","渡辺 皓太","神戸","完"],["DF","加藤 蓮","京都","完"]]},
+ "清水":{i:[["FW","オ・セフン","町田","完"],["FW","ジャーメイン良","広島","完"],["DF","須貝 英大","京都","完"],["MF","小泉 慶","FC東京","完"]],o:[["MF","宇野 禅斗","ボルシアMG","完"],["FW","髙橋 利樹","鳥栖","完"],["MF","中原 輝","鳥栖","完"]]},
+ "名古屋":{i:[["DF","高嶺 朋樹","札幌","完"],["MF","倍井 謙","復帰","復"]],o:[["DF","河面 旺成","水戸","期"],["MF","椎橋 慧也","福岡","完"],["DF","三國ケネディ","福岡","期"],["MF","山中 亮輔","京都","期"]]},
+ "京都":{i:[["DF","加藤 蓮","横浜FM","完"],["FW","加藤 拓己","松本","完"],["MF","山中 亮輔","名古屋","期"]],o:[["DF","喜多 壱也","R.ソシエダ","完"],["DF","麻田 将吾","柏","完"],["DF","須貝 英大","清水","完"]]},
+ "G大阪":{i:[["MF","イーライ・アダムス","豪州","完"]],o:[["MF","山本 天翔","ドルトムント","期"],["FW","南野 遥海","浦和","完"],["MF","満田 誠","柏","期"]]},
+ "C大阪":{i:[["DF","髙橋 仁胡","復帰","復"],["FW","小見 洋太","柏","期"],["GK","阿部 航斗","磐田","期"]],o:[["FW","中島 元彦","仙台","完"],["GK","キム・ジンヒョン","栃木C","期"]]},
+ "神戸":{i:[["FW","A.ロペス","ブラジル","完"],["MF","渡辺 皓太","横浜FM","完"]],o:[["FW","宮代 大聖","ラス・パルマス","完"],["MF","乾 貴士","磐田","完"]]},
+ "岡山":{i:[["FW","ナ・サンホ","町田","完"],["DF","白井 康介","FC東京","完"],["DF","本山 遥","神戸","期"]],o:[["DF","工藤 孝太","浦和","復"]]},
+ "広島":{i:[["FW","S.アレー","ユトレヒト","完"],["FW","浅野 拓磨","マジョルカ","完"]],o:[["FW","ジャーメイン良","清水","完"],["MF","仙波 大志","水戸","完"],["FW","木下 康介","清水","期"]]},
+ "福岡":{i:[["MF","O.ロメウ","スペイン","完"],["MF","椎橋 慧也","名古屋","完"],["DF","三國ケネディ","名古屋","期"],["FW","師岡 柊生","鹿島","完"],["FW","ウェリック・ポポ","ブラジル","完"],["DF","深澤 大輝","東京V","完"]],o:[["FW","S.ザヘディ","マレーシア","完"]]},
+ "長崎":{i:[["MF","保田 堅心","大分","完"],["DF","大南 拓磨","ベルギー","完"]],o:[["MF","安部 大晴","H.キール","期"]]},
+ "千葉":{i:[["FW","L.ホシャ","ポーランド","完"],["FW","エリソン","川崎F","完"],["DF","D.ホール","豪州","完"]],o:[["GK","若原 智哉","柏","完"]]},
+ "水戸":{i:[["DF","木本 恭生","FC東京","完"],["MF","仙波 大志","広島","完"],["DF","家泉 怜依","札幌","完"],["FW","谷口 海斗","豪州","完"]],o:[["MF","長尾 優斗","藤枝","完"]]}
+};
+(function(){
+ const badge=t=>{const m={"完":["#12B36A","完全"],"期":["#4C8DFF","期限付"],"復":["#8A6BFF","復帰"],"満":["#888","満了"],"昇":["#FF8A3D","昇格"]};const x=m[t]||["#888",t];return `<span class="t26b" style="background:${x[0]}">${x[1]}</span>`;};
+ const rowHTML=(e,dir)=>`<div class="t26row"><span class="t26pos">${e[0]}</span><span class="t26name plink" onclick="openPlayer('${e[1]}',{p:'${e[0]}',club:'${e[2]}',type:'${e[3]}'})">${e[1]}</span><span class="t26club">${dir==='in'?'←':'→'} ${e[2]}</span>${badge(e[3])}</div>`;
+ function draw(cl){const d=T26[cl]||{i:[],o:[]};
+  document.getElementById("t26board").innerHTML=
+   `<div class="t26col"><div class="t26h in">▶ IN（加入）</div>${d.i.length?d.i.map(e=>rowHTML(e,'in')).join(''):'<div class="t26empty">主な加入なし</div>'}</div>`+
+   `<div class="t26col"><div class="t26h out">◀ OUT（退団）</div>${d.o.length?d.o.map(e=>rowHTML(e,'out')).join(''):'<div class="t26empty">主な退団なし</div>'}</div>`;
+ }
+ const ctrl=document.getElementById("t26ctrl"); if(!ctrl)return;
+ T26_ORDER.forEach((cl,i)=>{const b=document.createElement("button");b.className="chip"+(i===0?" active":"");b.textContent=cl;
+   b.onclick=()=>{document.querySelectorAll("#t26ctrl .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");draw(cl);};
+   ctrl.appendChild(b);});
+ draw(T26_ORDER[0]);
+})();
+
+/* ===== PLAYER CARDS ===== */
+const PLAYERS={
+ "ラファエルエリアス":{p:"FW",nat:"🇧🇷 ブラジル",club:"京都サンガ",mv:6.0,note:"J1の市場価値トップ級。得点力に優れる。"},
+ "鈴木優磨":{p:"FW",age:30,nat:"🇯🇵 日本",club:"鹿島アントラーズ",mv:4.6,note:"鹿島の顔。得点力と勝負強さが持ち味。"},
+ "レオセアラ":{p:"FW",nat:"🇧🇷 ブラジル",club:"鹿島アントラーズ",mv:4.6,note:"鹿島のブラジル人ストライカー。"},
+ "川辺駿":{p:"MF",age:30,nat:"🇯🇵 日本",club:"サンフレッチェ広島",mv:3.7,note:"広島の中盤の要。元日本代表。"},
+ "佐藤龍之介":{p:"MF",age:19,nat:"🇯🇵 日本",club:"バレンシア（←FC東京）",mv:3.7,note:"10代の逸材。スペインへ挑戦。"},
+ "相馬勇紀":{p:"MF",age:28,nat:"🇯🇵 日本",club:"FC町田ゼルビア",mv:4.0,note:"町田のドリブラー。元日本代表。"},
+ "大迫敬介":{p:"GK",age:25,nat:"🇯🇵 日本",club:"サンフレッチェ広島",mv:3.6,note:"日本代表候補の正守護神。"},
+ "マテウストゥーレル":{p:"DF",age:25,nat:"🇧🇷 ブラジル",club:"ヴィッセル神戸",mv:3.6,note:"神戸の守備の柱。"},
+ "高井幸大":{p:"DF",age:20,nat:"🇯🇵 日本",club:"トッテナム（←川崎F）",fee:"移籍金 約10億円",note:"J→海外の歴代最高額でプレミアへ挑戦。"},
+ "三笘薫":{p:"FW",age:28,nat:"🇯🇵 日本",club:"ブライトン（←川崎F）",mv:66,note:"プレミアで活躍する日本のエース。"},
+ "古橋亨梧":{p:"FW",age:30,nat:"🇯🇵 日本",club:"レンヌ（←神戸）",note:"得点感覚に優れるストライカー。"},
+ "上田綺世":{p:"FW",age:27,nat:"🇯🇵 日本",club:"フェイエノールト（←鹿島）",note:"オランダで得点を量産。"},
+ "田中碧":{p:"MF",age:27,nat:"🇯🇵 日本",club:"リーズ（←川崎F）",note:"プレミアで戦うボランチ。"},
+ "渡辺皓太":{p:"MF",age:27,nat:"🇯🇵 日本",club:"ヴィッセル神戸（←横浜FM）",note:"J1通算175試合超の技巧派中盤。"},
+ "知念慶":{p:"MF",age:31,nat:"🇯🇵 日本",club:"横浜F・マリノス（←鹿島）",note:"実績あるボランチ。"},
+ "南野遥海":{p:"FW",age:22,nat:"🇯🇵 日本",club:"浦和レッズ（←G大阪）",note:"浦和が獲得した若手FW。"},
+ "鈴木章斗":{p:"FW",age:22,nat:"🇯🇵 日本",club:"サンフレッチェ広島",note:"2季連続2桁得点。欧州が注目。"},
+ "荒木遼太郎":{p:"MF",age:23,nat:"🇯🇵 日本",club:"FC東京",note:"技巧派の攻撃的MF。欧州から関心。"},
+ "セバスティアンアレー":{p:"FW",age:32,nat:"🇨🇮 コートジボワール",club:"サンフレッチェ広島",note:"元ドルトムントの大物FW。"},
+ "浅野拓磨":{p:"FW",age:31,nat:"🇯🇵 日本",club:"サンフレッチェ広島",note:"スピードが武器の元日本代表FW。"},
+ "アンデルソンロペス":{p:"FW",age:32,nat:"🇧🇷 ブラジル",club:"ヴィッセル神戸",note:"得点力の高いブラジル人FW。"},
+ "小野伸二":{p:"MF",nat:"🇯🇵 日本",club:"（元浦和ほか）",note:"日本を代表するテクニシャン。"},
+ "冨安健洋":{p:"DF",nat:"🇯🇵 日本",club:"（アーセナル等・元福岡）",note:"欧州でプレーした日本代表DF。"},
+ "前田大然":{p:"FW",nat:"🇯🇵 日本",club:"（セルティック・元横浜FM）",note:"驚異的なスピードのFW。"},
+ "Aイニエスタ":{p:"MF",nat:"🇪🇸 スペイン",club:"（元ヴィッセル神戸）",note:"世界的名手。神戸でプレーした。"},
+ "Fトーレス":{p:"FW",nat:"🇪🇸 スペイン",club:"（元サガン鳥栖）",note:"スペイン代表の名ストライカー。"},
+ "大迫勇也":{p:"FW",nat:"🇯🇵 日本",club:"ヴィッセル神戸",note:"日本代表FW。ポストプレーに定評。"}
+};
+const PMETA={
+ "三笘薫":{car:"川崎F（2018-2021）→ ブライトン",rep:"日本代表（W杯2022・アジア杯）",hon:"プレミアで日本人屈指の活躍。川崎で2冠に貢献"},
+ "古橋亨梧":{car:"FC岐阜 → 神戸 → セルティック → レンヌ",rep:"日本代表",hon:"スコティッシュ・プレミア優勝＆得点王、リーグ杯優勝"},
+ "上田綺世":{car:"法政大 → 鹿島 → セルクル → フェイエノールト",rep:"日本代表",hon:"エールディビジで得点を量産"},
+ "田中碧":{car:"川崎F → デュッセルドルフ → リーズ",rep:"日本代表（W杯2022）・東京五輪",hon:"川崎でJ1優勝、リーズでプレミア昇格"},
+ "高井幸大":{car:"川崎Fユース → 川崎F → トッテナム",rep:"日本代表（世代別〜A代表）",hon:"20歳でプレミア移籍（J→海外の歴代最高額）"},
+ "鈴木優磨":{car:"鹿島 → シント=トロイデン → 鹿島",rep:"日本代表歴",hon:"鹿島の得点源として長年活躍"},
+ "川辺駿":{car:"広島 → グラスホッパー → 広島",rep:"日本代表（W杯2022）",hon:"広島の中盤を長年けん引"},
+ "大迫敬介":{car:"広島ユース → 広島",rep:"日本代表・パリ五輪世代",hon:"J1屈指の正守護神"},
+ "浅野拓磨":{car:"広島 → アーセナル → ドイツ各クラブ → 広島",rep:"日本代表（W杯2大会）",hon:"W杯2022でドイツ撃破の決勝ゴール"},
+ "相馬勇紀":{car:"名古屋 → 鹿島 → ポルティモネンセ → 町田",rep:"日本代表歴",hon:"高精度のキックとドリブルが武器"},
+ "大迫勇也":{car:"鹿島 → ケルン → ブレーメン → 神戸",rep:"日本代表（W杯2大会）",hon:"神戸でJ1優勝。W杯2018でゴール"},
+ "アンデルソンロペス":{car:"札幌 → 横浜FM → 神戸",rep:"",hon:"J1得点王の実績を持つ点取り屋"},
+ "マテウストゥーレル":{car:"ブラジル → 神戸",rep:"",hon:"神戸のJ1連覇を守備で支える"},
+ "セバスティアンアレー":{car:"ユトレヒト → ドルトムント等 → 広島",rep:"コートジボワール代表",hon:"アフリカ選手権優勝、CL決勝経験。大病から復帰"},
+ "Aイニエスタ":{car:"バルセロナ → ヴィッセル神戸",rep:"スペイン代表",hon:"W杯2010優勝（決勝ゴール）、EURO2度、CL4度優勝"},
+ "Fトーレス":{car:"アトレティコ → リバプール → チェルシー → ミラン → 鳥栖",rep:"スペイン代表",hon:"W杯2010・EURO2度・CL・EL優勝"},
+ "前田大然":{car:"山口 → 松本 → 水戸 → 横浜FM → セルティック",rep:"日本代表（W杯2022）",hon:"スコットランド制覇に貢献"},
+ "冨安健洋":{car:"福岡 → シント=トロイデン → ボローニャ → アーセナル",rep:"日本代表（W杯2大会）",hon:"プレミアの強豪でプレー"},
+ "小野伸二":{car:"浦和 → フェイエノールト → 浦和 → 各地（引退）",rep:"日本代表（W杯）",hon:"フェイエでUEFAカップ優勝。日本屈指のテクニシャン"},
+ "レオセアラ":{car:"ブラジル → C大阪 → 鹿島",rep:"",hon:"J1で高い決定力を発揮"},
+ "ラファエルエリアス":{car:"ブラジル → 京都サンガ",rep:"",hon:"J1の得点ランキング上位"},
+ "鈴木章斗":{car:"広島ユース → 広島",rep:"世代別代表",hon:"2季連続2桁得点。今夏の欧州移籍が注目"},
+ "荒木遼太郎":{car:"鹿島 → FC東京",rep:"世代別代表",hon:"技巧派の攻撃的MF"},
+ "佐藤龍之介":{car:"FC東京 → バレンシア",rep:"世代別代表",hon:"10代でスペイン挑戦"},
+ "南野遥海":{car:"G大阪ユース → G大阪 → 浦和",rep:"",hon:"期待の若手FW"},
+ "知念慶":{car:"川崎F → 鹿島 → 横浜FM",rep:"",hon:"複数クラブで実績を積んだボランチ"},
+ "渡辺皓太":{car:"東京V → 横浜FM → 神戸",rep:"",hon:"J1通算175試合超の技巧派"}
+};
+Object.keys(PMETA).forEach(k=>{if(PLAYERS[k])Object.assign(PLAYERS[k],PMETA[k]);});
+const PNEW={
+ "ラファエルハットン":{p:"FW",nat:"🇧🇷 ブラジル",club:"セレッソ大阪",note:"C大阪の得点源。"},
+ "伊藤達哉":{p:"FW",nat:"🇯🇵 日本",club:"川崎フロンターレ",note:"ドリブルが武器のアタッカー。"},
+ "エリソン":{p:"FW",nat:"🇧🇷 ブラジル",club:"ジェフ千葉（←川崎F）",note:"川崎で二桁得点。"},
+ "細谷真大":{p:"FW",nat:"🇯🇵 日本",club:"柏レイソル",rep:"日本代表歴",note:"柏の若きエースストライカー。"},
+ "宮代大聖":{p:"FW",nat:"🇯🇵 日本",club:"ラス・パルマス（←神戸）",note:"神戸で活躍しスペインへ。"},
+ "稲垣祥":{p:"MF",nat:"🇯🇵 日本",club:"名古屋グランパス",rep:"日本代表歴",note:"得点力のあるボランチ。"},
+ "北川航也":{p:"FW",nat:"🇯🇵 日本",club:"清水エスパルス",note:"清水の得点源。"},
+ "木下康介":{p:"FW",nat:"🇯🇵 日本",club:"清水（←広島）",note:"長身の点取り屋。"},
+ "エリキ":{p:"FW",nat:"🇧🇷 ブラジル",club:"ヴィッセル神戸",note:"スピードのあるブラジル人FW。"},
+ "マルセロヒアン":{p:"FW",nat:"🇧🇷 ブラジル",club:"FC東京",note:"FC東京のブラジル人FW。"},
+ "宇佐美貴史":{p:"MF",nat:"🇯🇵 日本",club:"ガンバ大阪",rep:"日本代表歴",note:"G大阪の至宝。技巧派アタッカー。"},
+ "植中朝日":{p:"FW",nat:"🇯🇵 日本",club:"横浜F・マリノス",rep:"世代別代表",note:"横浜FMの若手アタッカー。"},
+ "マルコトゥーリオ":{p:"FW",nat:"🇧🇷 ブラジル",club:"京都サンガ",note:"京都の推進力あるアタッカー。"},
+ "奥川雅也":{p:"MF",nat:"🇯🇵 日本",club:"京都サンガ",note:"欧州経験もある技巧派。"}
+};
+Object.keys(PNEW).forEach(k=>{if(!PLAYERS[k])PLAYERS[k]=PNEW[k];});
+const PSTAT={
+ "レオセアラ":{app:34,g:21,a:0},"ラファエルエリアス":{app:27,g:18,a:4},"ラファエルハットン":{app:36,g:18,a:2},
+ "伊藤達哉":{app:35,g:13,a:3},"エリソン":{app:29,g:12,a:3},"細谷真大":{app:36,g:11,a:1},
+ "宮代大聖":{app:34,g:11,a:4},"稲垣祥":{app:38,g:11,a:5},"北川航也":{app:37,g:10,a:0},
+ "鈴木優磨":{app:38,g:10,a:5},"木下康介":{app:34,g:9,a:4},"エリキ":{app:29,g:9,a:4},
+ "相馬勇紀":{app:34,g:9,a:10},"鈴木章斗":{app:37,g:9,a:4},"マルセロヒアン":{app:30,g:8,a:1},
+ "宇佐美貴史":{app:29,g:8,a:2},"大迫勇也":{app:31,g:8,a:3},"植中朝日":{app:33,g:8,a:4},
+ "マルコトゥーリオ":{app:18,g:7,a:4},"奥川雅也":{app:29,g:7,a:2}
+};
+Object.keys(PSTAT).forEach(k=>{if(PLAYERS[k])PLAYERS[k].st=PSTAT[k];});
+const PTST={
+ "三笘薫":{y:"2020",cl:"川崎F",app:30,g:13,a:12},
+ "古橋亨梧":{y:"2021",cl:"神戸",app:21,g:15,a:2},
+ "上田綺世":{y:"2021",cl:"鹿島",app:29,g:14,a:1},
+ "前田大然":{y:"2021",cl:"横浜FM",app:36,g:23,a:3},
+ "高井幸大":{y:"2025",cl:"川崎F",app:22,g:2,a:0}
+};
+Object.keys(PTST).forEach(k=>{if(PLAYERS[k])PLAYERS[k].tst=PTST[k];});
+const PBIO={
+ "三笘薫":{born:"神奈川県",youth:"川崎F U-18 → 筑波大学"},
+ "古橋亨梧":{born:"奈良県",youth:"興國高校 → 中央大学 → FC岐阜"},
+ "上田綺世":{born:"茨城県",youth:"鹿島学園高校 → 法政大学"},
+ "田中碧":{born:"神奈川県",youth:"川崎フロンターレ U-18"},
+ "高井幸大":{born:"神奈川県",youth:"川崎フロンターレ U-18"},
+ "冨安健洋":{born:"福岡県",youth:"アビスパ福岡 U-18"},
+ "小野伸二":{born:"静岡県",youth:"清水商業高校"},
+ "大迫勇也":{born:"鹿児島県",youth:"鹿児島城西高校"},
+ "Aイニエスタ":{born:"スペイン",youth:"バルセロナ（ラ・マシア）"},
+ "Fトーレス":{born:"スペイン",youth:"アトレティコ・マドリード（下部組織）"},
+ "浅野拓磨":{born:"三重県",youth:"四日市中央工業高校"},
+ "相馬勇紀":{born:"東京都",youth:"三菱養和 → 早稲田大学"},
+ "稲垣祥":{born:"東京都",youth:"東京ヴェルディユース → 鹿屋体育大学"},
+ "宇佐美貴史":{born:"大阪府",youth:"ガンバ大阪ユース"},
+ "大迫敬介":{born:"鹿児島県",youth:"サンフレッチェ広島ユース"},
+ "細谷真大":{born:"千葉県",youth:"柏レイソル U-18"},
+ "荒木遼太郎":{born:"熊本県",youth:"東福岡高校"},
+ "宮代大聖":{born:"東京都",youth:"川崎フロンターレ U-18"},
+ "渡辺皓太":{born:"神奈川県",youth:"東京ヴェルディユース"},
+ "鈴木優磨":{born:"茨城県",youth:"鹿島学園高校"},
+ "知念慶":{born:"沖縄県"},
+ "南野遥海":{born:"兵庫県"},
+ "佐藤龍之介":{born:"東京都"},
+ "鈴木章斗":{born:"埼玉県"},
+ "レオセアラ":{born:"ブラジル"},
+ "ラファエルエリアス":{born:"ブラジル"},
+ "アンデルソンロペス":{born:"ブラジル"},
+ "エリキ":{born:"ブラジル"},
+ "マルセロヒアン":{born:"ブラジル"},
+ "マルコトゥーリオ":{born:"ブラジル"},
+ "セバスティアンアレー":{born:"フランス／コートジボワール"}
+};
+Object.keys(PBIO).forEach(k=>{if(PLAYERS[k])Object.assign(PLAYERS[k],PBIO[k]);});
+const PSTYLE={
+ "三笘薫":"世界屈指のドリブラー。緩急とカットインからのフィニッシュで左サイドを切り裂く。",
+ "古橋亨梧":"抜群のオフザボールの動きと決定力を持つ点取り屋。裏への飛び出しが武器。",
+ "上田綺世":"ポストプレーと得点の嗅覚を兼ね備えたCF。ヘディングにも強い。",
+ "田中碧":"配球と展開力に優れ、攻守のバランスを取るモダンなボランチ。",
+ "高井幸大":"長身の対人守備とビルドアップを備えた次世代のセンターバック。",
+ "冨安健洋":"複数ポジションをこなす万能型DF。対人と読みの強さが光る。",
+ "前田大然":"驚異的なスピードと献身的なハイプレスが武器のアタッカー。",
+ "大迫勇也":"強靭なポストプレーと得点力を兼備する日本代表級のCF。",
+ "浅野拓磨":"爆発的なスピードで背後を狙い続けるストライカー。",
+ "相馬勇紀":"高精度の左足とドリブルで違いを生む。セットプレーのキッカーも務める。",
+ "稲垣祥":"豊富な運動量とミドルシュートを持つ“得点も奪えるボランチ”。",
+ "宇佐美貴史":"天才的な左足を操る日本屈指のテクニシャン。",
+ "大迫敬介":"好反射とビルドアップ能力を備えた現代型GK。",
+ "鈴木優磨":"得点力と気迫、周囲を活かす動きでチームを牽引するエース。",
+ "レオセアラ":"エリア内の強さと決定力が光るブラジル人ストライカー。",
+ "ラファエルエリアス":"フィジカルと決定力を兼ね備えたブラジル人FW。",
+ "細谷真大":"スピードと裏抜けが持ち味の若きストライカー。",
+ "宮代大聖":"運動量と決定力を兼ね備える万能アタッカー。",
+ "荒木遼太郎":"創造性あふれるプレーメーカー。ドリブルとラストパスが武器。",
+ "佐藤龍之介":"10代とは思えない技術とゲーム理解を持つ攻撃的MF。",
+ "鈴木章斗":"スピードと得点力を兼ね備える成長株のFW。",
+ "Aイニエスタ":"ボールを失わない技術とビジョンで試合を支配した歴史的名手。",
+ "Fトーレス":"スピードと決定力を誇ったスペイン代表の名ストライカー。",
+ "アンデルソンロペス":"パワーとスピードでゴールに迫るブラジル人ストライカー。",
+ "セバスティアンアレー":"高さと決定力を備えた大型ストライカー。",
+ "伊藤達哉":"仕掛けの鋭いドリブルが武器のアタッカー。",
+ "エリソン":"推進力と決定力を持つブラジル人FW。",
+ "稲垣祥":"豊富な運動量とミドルシュートを持つ“得点も奪えるボランチ”。",
+ "北川航也":"抜け出しとフィニッシュに優れるストライカー。",
+ "木下康介":"高さを活かしたプレーが持ち味の長身FW。",
+ "エリキ":"スピードとドリブルで違いを生むブラジル人アタッカー。",
+ "マルセロヒアン":"力強い突破と決定力を持つブラジル人FW。",
+ "宇佐美貴史":"天才的な左足を操る日本屈指のテクニシャン。",
+ "植中朝日":"スペースを突く動きと得点力を持つ若手アタッカー。",
+ "マルコトゥーリオ":"推進力あるドリブルが武器のアタッカー。",
+ "奥川雅也":"欧州経験を持つ技巧派。得点・アシスト両面で貢献。",
+ "渡辺皓太":"運動量と技術を兼ね備える中盤の潤滑油。",
+ "知念慶":"守備意識と展開力を備えたボランチ。",
+ "南野遥海":"裏抜けと決定力に期待がかかる若手FW。",
+ "ラファエルハットン":"フィジカルと決定力を備えたブラジル人ストライカー。"
+};
+Object.keys(PSTYLE).forEach(k=>{if(PLAYERS[k])PLAYERS[k].style=PSTYLE[k];});
+const PADD2={
+ "Oロメウ":{p:"MF",nat:"🇪🇸 スペイン",club:"アビスパ福岡",note:"元スペイン代表。セルティックやサウサンプトンでプレーした実力派ボランチ。",style:"展開力と守備で中盤を落ち着かせるレジスタ。"},
+ "明本考浩":{p:"MF",nat:"🇯🇵 日本",born:"栃木県",club:"FC町田ゼルビア",note:"ベルギー帰りのアグレッシブな左サイド/WB。",style:"運動量と推進力で上下動を続けるハードワーカー。"}
+};
+Object.keys(PADD2).forEach(k=>{if(!PLAYERS[k])PLAYERS[k]=PADD2[k];else Object.assign(PLAYERS[k],PADD2[k]);});
+
+
+
+
+
+const _pk=n=>(n||"").replace(/[\s　・.]/g,"");
+function avatarSVG(pos,seed){
+ const skins=["#F4C7A3","#E8B58A","#C68642","#8D5524","#F1D2B6"];
+ const hairs=["#2b2b2b","#4a2f1b","#1a1a1a","#5a3a1a","#6b4a2a"];
+ let h=0; for(let i=0;i<seed.length;i++)h=(h*31+seed.charCodeAt(i))>>>0;
+ const skin=skins[h%skins.length], hair=hairs[(Math.floor(h/5))%hairs.length];
+ const jc=({GK:"#FFC948",DF:"#4C8DFF",MF:"#12B36A",FW:"#FF5C8A"})[pos]||"#8A6BFF";
+ return `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+   <rect x="14" y="74" width="17" height="16" rx="5" fill="${jc}" stroke="#243447" stroke-width="3"/>
+   <rect x="69" y="74" width="17" height="16" rx="5" fill="${jc}" stroke="#243447" stroke-width="3"/>
+   <path d="M30 74 q20 -9 40 0 v32 q-20 8 -40 0 z" fill="${jc}" stroke="#243447" stroke-width="3"/>
+   <rect x="44" y="60" width="12" height="12" fill="${skin}" stroke="#243447" stroke-width="2.5"/>
+   <circle cx="50" cy="42" r="22" fill="${skin}" stroke="#243447" stroke-width="3"/>
+   <path d="M28 42 q0-24 22-24 q22 0 22 24 q-7-11-22-11 q-15 0-22 11z" fill="${hair}" stroke="#243447" stroke-width="2.5"/>
+   <circle cx="43" cy="44" r="2.6" fill="#243447"/><circle cx="57" cy="44" r="2.6" fill="#243447"/>
+   <path d="M45 52 q5 4 10 0" stroke="#243447" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+   <text x="50" y="98" font-size="14" text-anchor="middle" fill="#fff" font-family="Baloo 2" font-weight="800">${pos}</text>
+ </svg>`;
+}
+function openPlayer(rawName,basic){
+ basic=basic||{};
+ const key=_pk(rawName); const p=PLAYERS[key]||null;
+ const pos=(p&&p.p)||basic.p||"—";
+ document.getElementById("plTitle").textContent=rawName;
+ document.getElementById("plSub").textContent=(p&&p.club)||basic.club||"";
+ document.getElementById("plAvatar").innerHTML=avatarSVG(pos,key||rawName);
+ let chips=`<span class="plchip">${pos}</span>`;
+ if(p&&p.nat)chips+=`<span class="plchip">${p.nat}</span>`;
+ if(p&&p.age)chips+=`<span class="plchip">${p.age}歳</span>`;
+ if((p&&p.club)||basic.club)chips+=`<span class="plchip">${(p&&p.club)||basic.club}</span>`;
+ if(p&&p.born)chips+=`<span class="plchip">📍 ${p.born}</span>`;
+ document.getElementById("plInfo").innerHTML=chips;
+ document.getElementById("plStyle").innerHTML=(p&&p.style)?`<div class="plstyle">🎯 ${p.style}</div>`:"";
+ let mv="";
+ if(p&&p.mv){mv=`<div class="plmv">💰 市場価値（参考）<b>約 ${p.mv}億円</b><div class="plbar"><div style="width:${Math.min(100,p.mv/8*100)}%"></div></div><span class="plnote2">Transfermarkt／CIES 推定・2026年時点（変動あり）</span></div>`;}
+ else if(p&&p.fee){mv=`<div class="plmv">💸 <b style="font-size:1.05rem">${p.fee}</b><span class="plnote2">報道ベース</span></div>`;}
+ else{mv=`<div class="plmv" style="background:var(--cream);border-style:solid;border-color:var(--line);color:var(--ink-soft)">市場価値は参考データなし（主要選手のみ収録）</div>`;}
+ document.getElementById("plMv").innerHTML=mv;
+ let st="";
+ if(p&&p.st){st=`<div class="plstats"><div class="ps"><div class="psv">${p.st.app}</div><div class="psl">出場試合</div></div><div class="ps"><div class="psv" style="color:#0B8F52">${p.st.g}</div><div class="psl">ゴール</div></div><div class="ps"><div class="psv" style="color:#4C8DFF">${p.st.a}</div><div class="psl">アシスト</div></div></div><span class="plnote2">2025 J1リーグ実績（Football LAB）※出場時間は非収録</span>`;}
+ document.getElementById("plStats").innerHTML=st;
+ let ts="";
+ if(p&&p.tst){const t=p.tst;ts=`<div style="font-weight:800;font-size:.85rem;margin-top:14px">🔙 移籍前のJでの実績（${t.y}・${t.cl}）</div><div class="plstats"><div class="ps"><div class="psv">${t.app}</div><div class="psl">出場試合</div></div><div class="ps"><div class="psv" style="color:#0B8F52">${t.g}</div><div class="psl">ゴール</div></div><div class="ps"><div class="psv" style="color:#4C8DFF">${t.a}</div><div class="psl">アシスト</div></div></div><span class="plnote2">当時のJ1リーグ（Football LAB）</span>`;}
+ document.getElementById("plTst").innerHTML=ts;
+ let note=(p&&p.note)||"";
+ if(basic.club&&!p){note=(basic.type?`移籍種別: ${basic.type}　`:"")+`関係クラブ: ${basic.club}`;}
+ document.getElementById("plNote").textContent=note;
+ let extra="";
+ if(p){const sec=(ic,lb,v)=>v?`<div class="plsec"><span class="pl-l">${ic} ${lb}</span><span class="pl-v">${v}</span></div>`:"";
+   extra=sec("🎓","育成（ユース／高校／大学）",p.youth)+sec("🧭","経歴（所属歴）",p.car)+sec("🎖️","代表",p.rep)+sec("🏆","タイトル・実績",p.hon);}
+ document.getElementById("plExtra").innerHTML=extra;
+ document.getElementById("plModalBg").classList.add("open");
+}
+function closePl(){document.getElementById("plModalBg").classList.remove("open");}
+document.getElementById("plModalBg").onclick=e=>{if(e.target.id==="plModalBg")closePl();};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closePl();});
+
+function closeModal(){document.getElementById("modalBg").classList.remove("open");}
+document.getElementById("modalBg").onclick=e=>{if(e.target.id==="modalBg")closeModal();};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+</script>
+</body>
+</html>
