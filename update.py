@@ -120,28 +120,11 @@ def _parse_transfer_table(table):
     return rows
 
 
-def debug_probe():
-    r = requests.get(TRANSFER_URL, headers=UA, timeout=30)
-    soup = BeautifulSoup(r.text, "html.parser")
-    nd = soup.find("script", id="__NEXT_DATA__")
-    print("__NEXT_DATA__ present:", bool(nd))
-    if nd:
-        print("__NEXT_DATA__ len:", len(nd.string or ""))
-        print("__NEXT_DATA__ head:", (nd.string or "")[:1500])
-    # also check for OUT-labeled tables anywhere and count all tables per club more precisely
-    sections = [sec for sec in soup.find_all("div", class_="p-transfer-list") if sec.find("table")]
-    for sec in sections[:3]:
-        name = sec.get_text(" ", strip=True)[:12]
-        tabs = sec.find_all(attrs={"role": "tab"}) or sec.find_all("button")
-        print(name, "tables=", len(sec.find_all("table")), "buttons/tabs=", len(tabs))
-        for b in tabs[:4]:
-            print("   TAB:", b.get_text(strip=True), b.attrs)
-    other_scripts = [sc for sc in soup.find_all("script") if sc.get("id") and "next" in sc.get("id", "").lower()]
-    print("other next-ish scripts:", [sc.get("id") for sc in other_scripts])
-
-
 def fetch_transfers():
-    """Jリーグ公式まとめページから確定移籍IN/OUTを取得。{短縮キー:{"i":[[pos,name,club,type]],"o":[...]}}"""
+    """Jリーグ公式まとめページから確定移籍IN/OUTを取得。{短縮キー:{"i":[...]} または {"i":[...],"o":[...]}}
+    公式ページは（クラブにより）OUT側の表がHTMLに含まれないことがあるため、
+    OUT表が実際に見つかったクラブについてのみ "o" キーを含める（＝見つからない限り既存データは保持）。
+    """
     try:
         r = requests.get(TRANSFER_URL, headers=UA, timeout=30)
         if r.status_code != 200:
@@ -158,11 +141,13 @@ def fetch_transfers():
         if not official:
             continue
         tables = sec.find_all("table")
-        ins = _parse_transfer_table(tables[0]) if len(tables) >= 1 else []
-        outs = _parse_transfer_table(tables[1]) if len(tables) >= 2 else []
-        result[CLUB_NAME_MAP[official]] = {
-            "i": ins[:MAX_ENTRIES_PER_DIRECTION], "o": outs[:MAX_ENTRIES_PER_DIRECTION],
-        }
+        entry = {}
+        if len(tables) >= 1:
+            entry["i"] = _parse_transfer_table(tables[0])[:MAX_ENTRIES_PER_DIRECTION]
+        if len(tables) >= 2:
+            entry["o"] = _parse_transfer_table(tables[1])[:MAX_ENTRIES_PER_DIRECTION]
+        if entry:
+            result[CLUB_NAME_MAP[official]] = entry
     print(f"transfers: {len(result)}/{len(CLUB_NAME_MAP)} クラブ取得")
     if len(result) < 15:
         print("transfers: 取得クラブ数が少なすぎるため安全のためスキップ")
@@ -179,14 +164,20 @@ def update_transfers(s, transfers):
     block = orig_block = m.group(0)
     changed = []
     for key, data in transfers.items():
-        ins_js = json.dumps(data.get("i", []), ensure_ascii=False, separators=(",", ":"))
-        outs_js = json.dumps(data.get("o", []), ensure_ascii=False, separators=(",", ":"))
-        pattern = re.compile(r'^( "%s":\{)i:\[.*\],o:\[.*\](\},?)$' % re.escape(key), re.MULTILINE)
-        newblock, n = pattern.subn(
-            lambda mo: mo.group(1) + "i:" + ins_js + ",o:" + outs_js + mo.group(2), block, count=1)
-        if n:
-            block = newblock
-            changed.append(key)
+        line_re = re.compile(r'^ "%s":\{i:(\[.*\]),o:(\[.*\])\}(,?)$' % re.escape(key), re.MULTILINE)
+        mo = line_re.search(block)
+        if not mo:
+            continue
+        old_i_json, old_o_json, trailing = mo.group(1), mo.group(2), mo.group(3)
+        new_i_json = (json.dumps(data["i"], ensure_ascii=False, separators=(",", ":"))
+                      if "i" in data else old_i_json)
+        new_o_json = (json.dumps(data["o"], ensure_ascii=False, separators=(",", ":"))
+                      if "o" in data else old_o_json)
+        if new_i_json == old_i_json and new_o_json == old_o_json:
+            continue
+        new_line = f' "{key}":{{i:{new_i_json},o:{new_o_json}}}{trailing}'
+        block = block[:mo.start()] + new_line + block[mo.end():]
+        changed.append(key)
     if block == orig_block:
         return s, False
     print("transfers: 更新クラブ", ",".join(changed))
@@ -248,7 +239,4 @@ def main():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--debug-probe":
-        debug_probe()
-    else:
-        main()
+    main()
