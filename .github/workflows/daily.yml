@@ -3,7 +3,12 @@ name: daily-update
 on:
   schedule:
     - cron: '0 23 * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      finance_probe:
+        description: 'run finance_probe.py only (no write)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -21,10 +26,15 @@ jobs:
           python-version: '3.12'
 
       - name: Install deps
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pdfplumber
 
       - name: Run updater
+        if: ${{ github.event.inputs.finance_probe != 'true' }}
         run: python update.py
+
+      - name: Run finance probe
+        if: ${{ github.event.inputs.finance_probe == 'true' }}
+        run: python finance_probe.py
 
       - name: Commit & push if changed
         run: |
