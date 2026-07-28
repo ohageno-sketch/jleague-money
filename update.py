@@ -107,22 +107,21 @@ def debug_probe():
     url = "https://www.jleague.jp/j1/special/transfer/"
     print(f"--- probing {url} ---")
     r = requests.get(url, headers=UA, timeout=30)
-    print("status:", r.status_code, "len:", len(r.text))
     soup = BeautifulSoup(r.text, "html.parser")
-    sections = soup.find_all("div", class_="p-transfer-list")
-    print("p-transfer-list count:", len(sections))
-    for i, sec in enumerate(sections):
-        full = sec.get_text(" ", strip=True)
-        name_guess = full.split(" IN")[0].split(" OUT")[0].strip()
-        tables = sec.find_all("table")
-        print(f"[{i}] club_name_guess={name_guess!r} tables={len(tables)}")
-        if i < 3:
-            # dump raw HTML of first table's first couple of rows for exact selector design
-            for ti, t in enumerate(tables[:2]):
-                rows = t.find_all("tr")
-                print(f"   table[{ti}] rows={len(rows)}")
-                for row in rows[:3]:
-                    print("   ROWHTML:", str(row)[:500])
+    sections = [s for s in soup.find_all("div", class_="p-transfer-list") if s.find("table")]
+    sec = sections[0]
+    print("club:", sec.get_text(" ", strip=True)[:20])
+    tables = sec.find_all("table")
+    print("num tables:", len(tables))
+    t = tables[0]
+    rows = t.find_all("tr")
+    print("HEADER FULL:", str(rows[0]))
+    print("DATAROW FULL:", str(rows[1]))
+    # find IN/OUT label elements
+    for el in sec.find_all(True, recursive=True):
+        txt = el.get_text(strip=True)
+        if txt in ("IN", "OUT") and len(list(el.children)) <= 1:
+            print("LABEL:", el.name, el.get("class"), txt)
 
 
 def main():
