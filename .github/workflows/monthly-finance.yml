@@ -1,8 +1,8 @@
-name: daily-update
+name: monthly-finance-update
 
 on:
   schedule:
-    - cron: '0 23 * * *'
+    - cron: '0 3 1 * *'
   workflow_dispatch: {}
 
 permissions:
@@ -21,10 +21,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install deps
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pdfplumber
 
-      - name: Run updater
-        run: python update.py
+      - name: Run finance updater
+        run: python update.py --finance
 
       - name: Commit & push if changed
         run: |
@@ -34,6 +34,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "no change"
           else
-            git commit -m "auto update ${{ github.run_id }}"
+            git commit -m "auto update finance ${{ github.run_id }}"
             git push
           fi

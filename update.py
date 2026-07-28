@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Jリーグ・マネー図鑑 デイリー更新スクリプト（GitHub Actions で毎日実行）。
-- 最終更新日を更新（確実）
-- 選手スタッツ（出場/得点/アシスト）を Football LAB から更新（確実）
-- 確定移籍 IN/OUT を公式まとめから best-effort で更新（取れた時だけ）
+Jリーグ・マネー図鑑 更新スクリプト。
+- python update.py         : デイリー更新（GitHub Actionsで毎日実行）
+    - 最終更新日を更新（確実）
+    - 選手スタッツ（出場/得点/アシスト）を Football LAB から更新（確実）
+    - 確定移籍 IN/OUT を公式まとめから best-effort で更新（取れた時だけ）
+- python update.py --finance : 会計情報の月次更新（別ワークフローから月1回実行）
+    - Jリーグ公式「クラブ経営情報開示資料」PDFの要旨（売上高合計・前期比など）を更新
+    - クラブ別の詳細決算数値（資産・人件費等）はPDFの表構造が年により変わり誤読リスクが
+      高いため自動反映の対象外。「本発表」確定後に人手で反映する運用とする。
 安全第一：更新後に妥当性チェックし、少しでも壊れていたら元に戻して書き込まない。
 """
 import io, re, sys, json, datetime
@@ -28,6 +33,8 @@ CLUB_NAME_MAP = {
 }
 TRANSFER_TYPE_MAP = [("完全", "完"), ("期限付き", "期"), ("満了", "満"), ("復帰", "復"), ("新加入", "新")]
 MAX_ENTRIES_PER_DIRECTION = 6
+
+FINANCE_PDF_URL = "https://aboutj.jleague.jp/corporate/assets/pdf/club_info/club_doc-2025.pdf"
 
 def norm(n):
     return re.sub(r"[\s　・.]", "", n or "")
@@ -189,6 +196,55 @@ def update_date(s):
     return s2, (s2 != s)
 
 
+def fetch_finance_headline():
+    """公式PDFの要旨（1-2. 主なトピックス）から売上高サマリーを抽出。
+    詳細なクラブ別数値はPDFの表構造に依存し誤読リスクが高いため対象外。
+    """
+    try:
+        import pdfplumber
+        r = requests.get(FINANCE_PDF_URL, headers=UA, timeout=30)
+        if r.status_code != 200:
+            print("finance: status", r.status_code); return None
+        text = ""
+        with pdfplumber.open(io.BytesIO(r.content)) as pdf:
+            for page in pdf.pages[:5]:
+                text += page.extract_text() or ""
+    except Exception as e:
+        print("finance fetch err:", e); return None
+
+    m_total = re.search(r"売上高は(\d+)クラブ合計で([\d,]+)億円", text)
+    m_yoy = re.search(r"前期比(\d+)%の成長", text)
+    m_grow = re.search(r"(\d+)クラブが増収", text)
+    m_league = re.search(r"Ｊクラブ全体での売上高は([\d,]+)億円超", text)
+    if not (m_total and m_yoy and m_grow and m_league):
+        print("finance: 主要指標を抽出できず → スキップ")
+        return None
+    return {
+        "clubs": m_total.group(1),
+        "total": m_total.group(2).replace(",", ""),
+        "yoy": m_yoy.group(1),
+        "grow": m_grow.group(1),
+        "league_total": m_league.group(1).replace(",", ""),
+    }
+
+
+def update_finance(s, fin):
+    if not fin:
+        return s, False
+    fields = {
+        "finYear": fin["clubs"], "finTotal": fin["total"], "finYoY": fin["yoy"],
+        "finGrowClubs": fin["grow"], "finLeagueTotal": fin["league_total"], "finAsOf": TODAY,
+    }
+    changed = False
+    for elem_id, val in fields.items():
+        pattern = r'(<b id="%s">)[^<]*(</b>)' % re.escape(elem_id)
+        s2 = re.sub(pattern, r"\g<1>" + str(val) + r"\g<2>", s, count=1)
+        if s2 != s:
+            changed = True
+        s = s2
+    return s, changed
+
+
 def valid(s):
     if not s.rstrip().endswith("</html>"):
         return False
@@ -238,5 +294,29 @@ def main():
     print("更新しました:", "、".join(changes) if changes else "(なし)")
 
 
+def main_finance():
+    try:
+        s = io.open(HTML, encoding="utf-8").read()
+    except Exception as e:
+        print("index.html 読み込み失敗:", e); sys.exit(0)
+    orig = s
+
+    try:
+        fin = fetch_finance_headline()
+        s, ok = update_finance(s, fin)
+    except Exception as e:
+        print("finance 更新スキップ:", e); return
+
+    if s == orig:
+        print("変更なし"); return
+    if not valid(s):
+        print("妥当性チェック失敗 → 書き込みを中止（元のまま）"); return
+    io.open(HTML, "w", encoding="utf-8").write(s)
+    print("更新しました: 会計情報(2025年度速報)")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "--finance":
+        main_finance()
+    else:
+        main()
