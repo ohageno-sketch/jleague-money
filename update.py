@@ -102,6 +102,41 @@ def valid(s):
     return True
 
 
+def debug_probe():
+    """DEBUG: 移籍情報ページの実際の構造を調べるための一時関数（本番機能には影響しない）。"""
+    urls = [
+        "https://www.jleague.jp/special/transfer/2026/j1.html",
+        "https://www.jleague.jp/j1/special/transfer/",
+    ]
+    for url in urls:
+        print(f"--- probing {url} ---")
+        try:
+            r = requests.get(url, headers=UA, timeout=30)
+            print("status:", r.status_code, "len:", len(r.text))
+            if r.status_code != 200:
+                continue
+            soup = BeautifulSoup(r.text, "html.parser")
+            print("title:", soup.title.get_text() if soup.title else None)
+            print("table count:", len(soup.find_all("table")))
+            for kw in ("完全移籍", "期限付き移籍", "契約満了", "加入", "退団"):
+                print(f'kw "{kw}" occurrences:', r.text.count(kw))
+            # dump a small structural sample
+            body = soup.body
+            if body:
+                # print first few "row-like" elements
+                candidates = body.find_all(["tr", "li", "div"], limit=4000)
+                shown = 0
+                for el in candidates:
+                    txt = el.get_text(" ", strip=True)
+                    if any(k in txt for k in ("完全移籍", "期限付き移籍", "契約満了")):
+                        print("SAMPLE:", el.name, el.get("class"), "|", txt[:200])
+                        shown += 1
+                        if shown >= 15:
+                            break
+        except Exception as e:
+            print("probe err:", e)
+
+
 def main():
     try:
         s = io.open(HTML, encoding="utf-8").read()
@@ -129,4 +164,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "--debug-probe":
+        debug_probe()
+    else:
+        main()
