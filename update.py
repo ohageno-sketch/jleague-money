@@ -120,6 +120,26 @@ def _parse_transfer_table(table):
     return rows
 
 
+def debug_probe():
+    r = requests.get(TRANSFER_URL, headers=UA, timeout=30)
+    soup = BeautifulSoup(r.text, "html.parser")
+    nd = soup.find("script", id="__NEXT_DATA__")
+    print("__NEXT_DATA__ present:", bool(nd))
+    if nd:
+        print("__NEXT_DATA__ len:", len(nd.string or ""))
+        print("__NEXT_DATA__ head:", (nd.string or "")[:1500])
+    # also check for OUT-labeled tables anywhere and count all tables per club more precisely
+    sections = [sec for sec in soup.find_all("div", class_="p-transfer-list") if sec.find("table")]
+    for sec in sections[:3]:
+        name = sec.get_text(" ", strip=True)[:12]
+        tabs = sec.find_all(attrs={"role": "tab"}) or sec.find_all("button")
+        print(name, "tables=", len(sec.find_all("table")), "buttons/tabs=", len(tabs))
+        for b in tabs[:4]:
+            print("   TAB:", b.get_text(strip=True), b.attrs)
+    other_scripts = [sc for sc in soup.find_all("script") if sc.get("id") and "next" in sc.get("id", "").lower()]
+    print("other next-ish scripts:", [sc.get("id") for sc in other_scripts])
+
+
 def fetch_transfers():
     """Jリーグ公式まとめページから確定移籍IN/OUTを取得。{短縮キー:{"i":[[pos,name,club,type]],"o":[...]}}"""
     try:
@@ -228,4 +248,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "--debug-probe":
+        debug_probe()
+    else:
+        main()
