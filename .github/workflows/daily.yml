@@ -3,12 +3,7 @@ name: daily-update
 on:
   schedule:
     - cron: '0 23 * * *'
-  workflow_dispatch:
-    inputs:
-      debug_probe:
-        description: 'run debug probe only (no write)'
-        type: boolean
-        default: false
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -29,12 +24,7 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Run updater
-        if: ${{ github.event.inputs.debug_probe != 'true' }}
         run: python update.py
-
-      - name: Run debug probe
-        if: ${{ github.event.inputs.debug_probe == 'true' }}
-        run: python update.py --debug-probe
 
       - name: Commit & push if changed
         run: |

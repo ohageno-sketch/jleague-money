@@ -1441,7 +1441,7 @@ const T26={
  "水戸":{i:[["DF","木本 恭生","FC東京","完"],["MF","仙波 大志","広島","完"],["DF","家泉 怜依","札幌","完"],["FW","谷口 海斗","豪州","完"]],o:[["MF","長尾 優斗","藤枝","完"]]}
 };
 (function(){
- const badge=t=>{const m={"完":["#12B36A","完全"],"期":["#4C8DFF","期限付"],"復":["#8A6BFF","復帰"],"満":["#888","満了"],"昇":["#FF8A3D","昇格"]};const x=m[t]||["#888",t];return `<span class="t26b" style="background:${x[0]}">${x[1]}</span>`;};
+ const badge=t=>{const m={"完":["#12B36A","完全"],"期":["#4C8DFF","期限付"],"復":["#8A6BFF","復帰"],"満":["#888","満了"],"昇":["#FF8A3D","昇格"],"新":["#12B36A","新加入"],"移":["#888","移籍"]};const x=m[t]||["#888",t];return `<span class="t26b" style="background:${x[0]}">${x[1]}</span>`;};
  const rowHTML=(e,dir)=>`<div class="t26row"><span class="t26pos">${e[0]}</span><span class="t26name plink" onclick="openPlayer('${e[1]}',{p:'${e[0]}',club:'${e[2]}',type:'${e[3]}'})">${e[1]}</span><span class="t26club">${dir==='in'?'←':'→'} ${e[2]}</span>${badge(e[3])}</div>`;
  function draw(cl){const d=T26[cl]||{i:[],o:[]};
   document.getElementById("t26board").innerHTML=
