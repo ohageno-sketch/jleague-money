@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ohageno-sketch.github.io/jleague-money/sitemap.xml
